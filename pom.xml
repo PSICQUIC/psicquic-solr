@@ -100,7 +100,6 @@
     <profiles>
         <profile>
             <id>exec</id>
-
             <build>
                 <plugins>
                     <plugin>
@@ -119,10 +118,8 @@
                             <arguments>
                                 <argument>-Xmx2024m</argument>
                                 <argument>-Xms256m</argument>
-
                                 <argument>-classpath</argument>
-                                <classpath />
-
+                                <classpath/>
                                 <argument>org.hupo.psi.mi.psicquic.indexing.batch.SolrMitabIndexer</argument>
                             </arguments>
                         </configuration>
@@ -151,7 +148,7 @@
                                 <argument>-Xmx2024m</argument>
 
                                 <argument>-classpath</argument>
-                                <classpath />
+                                <classpath/>
 
                                 <argument>org.hupo.psi.mi.psicquic.indexing.batch.SolrMitabIndexer</argument>
                                 <argument>${indexing.id}</argument>
@@ -160,6 +157,15 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>disable-java8-doclint</id>
+            <activation>
+                <jdk>[1.8,)</jdk>
+            </activation>
+            <properties>
+                <additionalparam>-Xdoclint:none</additionalparam>
+            </properties>
         </profile>
     </profiles>
 
