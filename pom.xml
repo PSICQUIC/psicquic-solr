@@ -6,22 +6,25 @@
     <version>1.2.5-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>psicquic-solr</name>
+    <name>PSI :: PSICQUIC Solr</name>
 
     <scm>
-        <connection>scm:svn:https://psicquic.googlecode.com/svn/trunk/psicquic-solr/</connection>
-        <developerConnection>scm:svn:https://psicquic.googlecode.com/svn/trunk/psicquic-solr/</developerConnection>
-        <url>http://code.google.com/p/psicquic/source/browse/#svn/trunk/psicquic-solr</url>
+        <connection>scm:git:https://github.com/PSICQUIC/psicquic-solr</connection>
+        <developerConnection>scm:git:https://github.com/PSICQUIC/psicquic-solr</developerConnection>
+        <url>https://github.com/PSICQUIC/psicquic-solr</url>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
         <solr.url>http://127.0.0.1:8983/solr</solr.url>
         <calimocho.version>2.5.1</calimocho.version>
-        <psimi.version>1.8.4</psimi.version>
+        <!--Latest version. Frozen project-->
+        <psimi.version>1.8.5</psimi.version>
         <spring.version>3.1.2.RELEASE</spring.version>
     </properties>
 
     <build>
+        <finalName>${project.artifactId}-${project.version}</finalName>
 
         <resources>
             <resource>
@@ -31,25 +34,35 @@
         </resources>
         <plugins>
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.3</version>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <!--mvn jgitflow:release-start -Dgit.user=xxxx -Dgit.password=xxxx-->
+                <!--mvn jgitflow:release-finish -Dmaven.javadoc.skip=true -Dgit.user=xxxx -Dgit.password=xxxx-->
+                <groupId>external.atlassian.jgitflow</groupId>
+                <artifactId>jgitflow-maven-plugin</artifactId>
+                <version>1.0-m5.1</version>
                 <configuration>
-                    <descriptors>
-                        <descriptor>src/main/assembly/descriptor.xml</descriptor>
-                    </descriptors>
+                    <flowInitContext>
+                        <masterBranchName>master</masterBranchName>
+                        <developBranchName>develop</developBranchName>
+                        <featureBranchPrefix>feature-</featureBranchPrefix>
+                        <releaseBranchPrefix>release-</releaseBranchPrefix>
+                        <hotfixBranchPrefix>hotfix-</hotfixBranchPrefix>
+                        <versionTagPrefix>${project.artifactId}-</versionTagPrefix>
+                    </flowInitContext>
+                    <!-- see goals wiki page for configuration options -->
+                    <!--Whether to allow untracked files when checking if the working tree is clean.-->
+                    <allowUntracked>true</allowUntracked>
+                    <username>${git.user}</username>
+                    <password>${git.password}</password>
+                    <pullMaster>true</pullMaster>
+                    <pullDevelop>true</pullDevelop>
+                    <pushReleases>true</pushReleases>
+                    <pushHotfixes>true</pushHotfixes>
+                    <pushFeatures>true</pushFeatures>
                 </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
                 <executions>
                     <execution>
                         <id>attach-source</id>
@@ -79,14 +92,6 @@
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
                 </configuration>
             </plugin>
         </plugins>
@@ -164,7 +169,7 @@
         <dependency>
             <groupId>psidev.psi.mi</groupId>
             <artifactId>psimitab</artifactId>
-            <version>1.8.4.2</version>
+            <version>${psimi.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.commons</groupId>
@@ -384,29 +389,28 @@
 
     <repositories>
         <repository>
-            <id>intact.nexus</id>
-            <name>IntAct Nexus</name>
-            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/groups/public</url>
+            <id>nexus-ebi-release-repo</id>
+            <url>http://www.ebi.ac.uk/Tools/maven/repos/content/groups/ebi-repo/</url>
+        </repository>
+        <repository>
+            <id>nexus-ebi-snapshot-repo</id>
+            <url>http://www.ebi.ac.uk/Tools/maven/repos/content/groups/ebi-snapshots/</url>
         </repository>
     </repositories>
 
-    <pluginRepositories>
-        <pluginRepository>
-            <id>intact.nexus</id>
-            <name>IntAct Nexus</name>
-            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/groups/public</url>
-        </pluginRepository>
-    </pluginRepositories>
-
     <distributionManagement>
+        <!-- EBI repo -->
         <repository>
-            <id>ebi-repo</id>
-            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo</url>
+            <id>pst-release</id>
+            <name>EBI Nexus Repository</name>
+            <url>http://www.ebi.ac.uk/Tools/maven/repos/content/repositories/pst-release</url>
         </repository>
-
+        <!-- EBI SNAPSHOT repo -->
         <snapshotRepository>
-            <id>ebi-repo-snapshots</id>
-            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo-snapshots</url>
+            <uniqueVersion>false</uniqueVersion>
+            <id>pst-snapshots</id>
+            <name>EBI Nexus Snapshots Repository</name>
+            <url>http://www.ebi.ac.uk/Tools/maven/repos/content/repositories/pst-snapshots</url>
         </snapshotRepository>
     </distributionManagement>
 
