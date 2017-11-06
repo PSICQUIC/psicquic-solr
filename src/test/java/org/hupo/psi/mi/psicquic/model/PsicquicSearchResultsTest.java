@@ -106,7 +106,8 @@ public class PsicquicSearchResultsTest  extends AbstractSolrServerTest {
         xgmml.close();
     }
 
-    @Test
+
+    @Test //TODO Fix biopax-rdf converter and this test when a new version for biopax supporting https is release (6-Nov 2017)
     public void test_create_rdf_results() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException, SolrServerException, PsicquicSolrException, PsimiTabException, IOException, XmlConversionException, IllegalAccessException {
 
         solrMitabIndexer.startJob("mitabIndexNegativeJob");
