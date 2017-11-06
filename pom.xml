@@ -3,7 +3,7 @@
 
     <groupId>org.hupo.psi.mi.psicquic</groupId>
     <artifactId>psicquic-solr</artifactId>
-    <version>1.2.5-SNAPSHOT</version>
+    <version>1.2.6-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>PSI :: PSICQUIC Solr</name>
@@ -119,7 +119,7 @@
                                 <argument>-Xmx2024m</argument>
                                 <argument>-Xms256m</argument>
                                 <argument>-classpath</argument>
-                                <classpath/>
+                                <classpath />
                                 <argument>org.hupo.psi.mi.psicquic.indexing.batch.SolrMitabIndexer</argument>
                             </arguments>
                         </configuration>
@@ -148,7 +148,7 @@
                                 <argument>-Xmx2024m</argument>
 
                                 <argument>-classpath</argument>
-                                <classpath/>
+                                <classpath />
 
                                 <argument>org.hupo.psi.mi.psicquic.indexing.batch.SolrMitabIndexer</argument>
                                 <argument>${indexing.id}</argument>
