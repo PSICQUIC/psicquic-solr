@@ -95,8 +95,6 @@ public class SolrHomeBuilder {
                 }
             }
 
-            solrHomeDir = solrHomeToCreate;
-            solrWar = solrWarToCreate;
         }
         // only copy solr.war when solr.war does not exist
         else if (!solrWarToCreate.exists() && solrWar == null){
@@ -135,10 +133,10 @@ public class SolrHomeBuilder {
                     }
                 }
             }
-
-            solrHomeDir = solrHomeToCreate;
-            solrWar = solrWarToCreate;
         }
+
+        solrHomeDir = solrHomeToCreate;
+        solrWar = solrWarToCreate;
 
         if (log.isDebugEnabled()) {
             log.debug("\nSolr Home: {}\nSolr WAR: {}", solrHomeDir.toString(), solrWar.toString());
