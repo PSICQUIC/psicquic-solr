@@ -14,9 +14,6 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import psidev.psi.mi.tab.PsimiTabException;
-import psidev.psi.mi.tab.PsimiTabReader;
-import psidev.psi.mi.xml.converter.ConverterException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -56,7 +53,7 @@ public class PsicquicSolrServerTest extends AbstractSolrServerTest {
     @Test
     public void test_free_text_query_default_fields() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException, SolrServerException, PsicquicSolrException {
 
-        solrMitabIndexer.startJob("mitabIndexNegativeJob");
+        solrMitabIndexer.startJob("mitabIndexMitab28Job");
 
         SolrServer server = solrJettyRunner.getSolrServer();
 
@@ -91,14 +88,6 @@ public class PsicquicSolrServerTest extends AbstractSolrServerTest {
 
         Assert.assertNotNull(results51);
         Assert.assertEquals(1L, results51.getNumberResults());
-        /*PsicquicSearchResults results52 = psicquicServer.search("\"Loo DT et al.\"", null, null, null, null);
-
-        Assert.assertNotNull(results52);
-        Assert.assertEquals(2L, results52.getNumberResults());
-        PsicquicSearchResults results53 = psicquicServer.search("1998", null, null, null, null);
-
-        Assert.assertNotNull(results53);
-        Assert.assertEquals(1L, results53.getNumberResults());*/
 
         // default fields species
         PsicquicSearchResults results61 = psicquicServer.search("human-jurkat", null, null, PsicquicSolrServer.RETURN_TYPE_MITAB27, null);
@@ -133,89 +122,99 @@ public class PsicquicSolrServerTest extends AbstractSolrServerTest {
 
         Assert.assertNotNull(results10);
         Assert.assertEquals(2L, results10.getNumberResults());
+
+        // default field bioeffect
+        PsicquicSearchResults results11 = psicquicServer.search("\"antioxidant activity\"", null, null, PsicquicSolrServer.RETURN_TYPE_MITAB28, null);
+
+        Assert.assertNotNull(results11);
+        Assert.assertEquals(1L, results11.getNumberResults());
+
+        // default field causalstatement
+        PsicquicSearchResults results12 = psicquicServer.search("\"up regulates\" AND negative:(true OR false)", null, null, PsicquicSolrServer.RETURN_TYPE_MITAB28, null);
+
+        Assert.assertNotNull(results12);
+        Assert.assertEquals(2L, results12.getNumberResults());
     }
 
     @Test
-    public void query_subset_results() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException, SolrServerException, PsicquicSolrException, PsimiTabException, IOException {
+    public void query_subset_results() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException, SolrServerException, PsicquicSolrException {
 
         solrMitabIndexer.startJob("mitabIndexNegativeJob");
 
         SolrServer server = solrJettyRunner.getSolrServer();
 
         PsicquicSolrServer psicquicServer = new PsicquicSolrServer(server);
-        PsimiTabReader mitabReader = new PsimiTabReader();
 
         // query start is 2. Only 2 results are expected
         PsicquicSearchResults results = psicquicServer.search("negative:(true OR false)", 2, null, PsicquicSolrServer.RETURN_TYPE_MITAB27, null);
 
         Assert.assertNotNull(results);
-        Assert.assertEquals(2L, mitabReader.read(results.getMitab()).size());
+        Assert.assertEquals(2, results.getResults().size());
 
         // query max is 3. Only 3 results are expected
         PsicquicSearchResults results2 = psicquicServer.search("negative:(true OR false)", null, 3, PsicquicSolrServer.RETURN_TYPE_MITAB27, null);
 
         Assert.assertNotNull(results2);
-        Assert.assertEquals(3L, mitabReader.read(results2.getMitab()).size());
+        Assert.assertEquals(3L, results2.getResults().size());
 
         // query rows is 1 and query start = 2. Only 1 results are expected
         PsicquicSearchResults results3 = psicquicServer.search("negative:(true OR false)", 2, 1, PsicquicSolrServer.RETURN_TYPE_MITAB27, null);
 
         Assert.assertNotNull(results3);
-        Assert.assertEquals(1L, mitabReader.read(results3.getMitab()).size());
+        Assert.assertEquals(1L, results3.getResults().size());
 
         // query rows is 2 and query start = 3. Only 1 results are expected because number max of results = 4
         PsicquicSearchResults results4 = psicquicServer.search("negative:(true OR false)", 3, 2, PsicquicSolrServer.RETURN_TYPE_MITAB27, null);
 
         Assert.assertNotNull(results4);
-        Assert.assertEquals(1L, mitabReader.read(results4.getMitab()).size());
+        Assert.assertEquals(1L, results4.getResults().size());
     }
 
     @Test
-    public void query_using_filters() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException, SolrServerException, PsicquicSolrException, PsimiTabException, IOException {
+    public void query_using_filters() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException, SolrServerException, PsicquicSolrException {
 
         solrMitabIndexer.startJob("mitabIndexNegativeJob");
 
         SolrServer server = solrJettyRunner.getSolrServer();
 
         PsicquicSolrServer psicquicServer = new PsicquicSolrServer(server);
-        PsimiTabReader mitabReader = new PsimiTabReader();
 
         // identifier:P07228 is matching two results but with the query filter on participant detection method, only one result is expected
         PsicquicSearchResults results = psicquicServer.search("identifier:P07228 AND negative:(true OR false)", null, null, PsicquicSolrServer.RETURN_TYPE_MITAB27, "pmethod:\"predetermined participant\"");
 
         Assert.assertNotNull(results);
-        Assert.assertEquals(1, mitabReader.read(results.getMitab()).size());
+        Assert.assertEquals(1L, results.getNumberResults());
 
         // identifier:P21333 is matching four results but with the query filter on detection method + on negative, only one result is expected
         PsicquicSearchResults results2 = psicquicServer.searchWithFilters("identifier:P21333 AND negative:(true OR false)", null, null, PsicquicSolrServer.RETURN_TYPE_MITAB27, new String[]{"detmethod:\"anti bait coimmunoprecipitation\"", "negative:true"});
 
         Assert.assertNotNull(results2);
-        Assert.assertEquals(1, mitabReader.read(results2.getMitab()).size());
+        Assert.assertEquals(1L, results2.getNumberResults());
 
         // 9722563 is matching four results (default query in pubid is working) but with the query filter on detection method + on negative, only one result is expected
         PsicquicSearchResults results3 = psicquicServer.searchWithFilters("9722563 AND negative:(true OR false)", null, null, PsicquicSolrServer.RETURN_TYPE_MITAB27, new String[]{"detmethod:\"anti bait coimmunoprecipitation\"", "negative:true"});
 
         Assert.assertNotNull(results3);
-        Assert.assertEquals(1, mitabReader.read(results3.getMitab()).size());
+        Assert.assertEquals(1L, results3.getNumberResults());
 
         // western blot is not matching two results (default query in pmethod is not allowed)
         PsicquicSearchResults results4 = psicquicServer.searchWithFilters("\"western blot\" AND negative:(true OR false)", null, null, PsicquicSolrServer.RETURN_TYPE_MITAB27, new String[]{"detmethod:\"anti bait coimmunoprecipitation\"", "negative:true"});
 
         Assert.assertNotNull(results4);
-        Assert.assertEquals(0, mitabReader.read(results4.getMitab()).size());
+        Assert.assertEquals(0L, results4.getNumberResults());
     }
 
     @Test
-    public void test_valid_return_type() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException, SolrServerException, PsicquicSolrException, ConverterException, IOException {
+    public void test_valid_return_type() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException, SolrServerException, PsicquicSolrException, IOException {
 
-        solrMitabIndexer.startJob("mitabIndexNegativeJob");
+        solrMitabIndexer.startJob("mitabIndexMitab28Job");
 
         SolrServer server = solrJettyRunner.getSolrServer();
 
         PsicquicSolrServer psicquicServer = new PsicquicSolrServer(server);
 
         // default return type is mitab 25
-        PsicquicSearchResults results = psicquicServer.search("*", null, null, PsicquicSolrServer.RETURN_TYPE_MITAB25, null);
+        PsicquicSearchResults results = psicquicServer.search("*", null, null, PsicquicSolrServer.RETURN_TYPE_DEFAULT, null);
 
         Assert.assertNotNull(results);
         InputStream mitab = results.getMitab();
@@ -264,11 +263,21 @@ public class PsicquicSolrServerTest extends AbstractSolrServerTest {
         reader5.close();
         Assert.assertEquals(42, firstLine5.split("\t").length);
 
-        // return type is count, no mitab is generated
-        PsicquicSearchResults results6 = psicquicServer.search("*", null, null, PsicquicSolrServer.RETURN_TYPE_COUNT, null);
+        // return type is mitab 28
+        PsicquicSearchResults results6 = psicquicServer.search("*", null, null, PsicquicSolrServer.RETURN_TYPE_MITAB28, null);
 
         Assert.assertNotNull(results6);
-        Assert.assertNull(results6.getMitab());
+        InputStream mitab6 = results6.getMitab();
+        BufferedReader reader6 = new BufferedReader(new InputStreamReader(mitab6));
+        String firstLine6 = reader6.readLine();
+        reader6.close();
+        Assert.assertEquals(46, firstLine6.split("\t").length);
+
+        // return type is count, no mitab is generated
+        PsicquicSearchResults results7 = psicquicServer.search("*", null, null, PsicquicSolrServer.RETURN_TYPE_COUNT, null);
+
+        Assert.assertNotNull(results7);
+        Assert.assertNull(results7.getMitab());
     }
 
     @Test

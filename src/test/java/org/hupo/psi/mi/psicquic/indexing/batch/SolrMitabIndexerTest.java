@@ -136,6 +136,122 @@ public class SolrMitabIndexerTest extends AbstractSolrServerTest {
     }
 
     @Test
+    public void test_indexing_mitab28() throws Exception {
+        // Note that the mitabIndexMitab28Job indexs the sampleFileMitab28.txt which is the same as
+        // sampleFileNegative.txt (indexed by mitabIndexNegativeJob) with the addition of 4 new Mitab28 columns
+        // So, this test is pretty much the same as test_indexing_negative()
+
+        solrMitabIndexer.startJob("mitabIndexMitab28Job");
+
+        HttpSolrServer server = solrJettyRunner.getSolrServer();
+
+        Assert.assertEquals(4L, server.query(new SolrQuery("*:*")).getResults().getNumFound());
+
+        // two negative, two positive
+        Assert.assertEquals(2L, server.query(new SolrQuery("negative:true")).getResults().getNumFound());
+        Assert.assertEquals(2L, server.query(new SolrQuery("negative:false")).getResults().getNumFound());
+
+        // test idA and idB -> identifier and id
+        Assert.assertEquals(2L, server.query(new SolrQuery("id:P07228")).getResults().getNumFound());
+        Assert.assertEquals(2L, server.query(new SolrQuery("identifier:P07228")).getResults().getNumFound());
+        Assert.assertEquals(1L, server.query(new SolrQuery("idA:P07228")).getResults().getNumFound());
+        Assert.assertEquals(1L, server.query(new SolrQuery("idB:P07228")).getResults().getNumFound());
+
+        // test altidA and altidB -> identifier and id
+        Assert.assertEquals(2L, server.query(new SolrQuery("id:EBI-5606437")).getResults().getNumFound());
+        Assert.assertEquals(2L, server.query(new SolrQuery("identifier:EBI-5606437")).getResults().getNumFound());
+        Assert.assertEquals(0L, server.query(new SolrQuery("idA:EBI-5606437")).getResults().getNumFound());
+        Assert.assertEquals(0L, server.query(new SolrQuery("idB:EBI-5606437")).getResults().getNumFound());
+
+        // test altiasA and aliasB -> identifier and alias
+        Assert.assertEquals(2L, server.query(new SolrQuery("alias:RGD-receptor")).getResults().getNumFound());
+        Assert.assertEquals(2L, server.query(new SolrQuery("identifier:RGD-receptor")).getResults().getNumFound());
+        Assert.assertEquals(0L, server.query(new SolrQuery("idA:RGD-receptor")).getResults().getNumFound());
+        Assert.assertEquals(0L, server.query(new SolrQuery("idB:RGD-receptor")).getResults().getNumFound());
+        Assert.assertEquals(0L, server.query(new SolrQuery("id:RGD-receptor")).getResults().getNumFound());
+
+        // test detmethod
+        Assert.assertEquals(1L, server.query(new SolrQuery("detmethod:\"two hybrid\"")).getResults().getNumFound());
+
+        // test author
+        Assert.assertEquals(1L, server.query(new SolrQuery("pubauth:\"Loo DT et al.(1998)\"")).getResults().getNumFound());
+
+        // test pub id
+        Assert.assertEquals(4L, server.query(new SolrQuery("pubid:9722563")).getResults().getNumFound());
+        Assert.assertEquals(4L, server.query(new SolrQuery("pubid:imex")).getResults().getNumFound());
+
+        // test protein species
+        Assert.assertEquals(2L, server.query(new SolrQuery("taxidA:\"human-jurkat\"")).getResults().getNumFound());
+        Assert.assertEquals(0L, server.query(new SolrQuery("taxidB:\"human-jurkat\"")).getResults().getNumFound());
+        Assert.assertEquals(2L, server.query(new SolrQuery("species:\"human-jurkat\"")).getResults().getNumFound());
+
+        // test interaction type
+        Assert.assertEquals(1L, server.query(new SolrQuery("type:\"MI:0407\"")).getResults().getNumFound());
+
+        // test interaction id
+        Assert.assertEquals(1L, server.query(new SolrQuery("interaction_id:EBI-5630468")).getResults().getNumFound());
+
+        // test biorole
+        Assert.assertEquals(4L, server.query(new SolrQuery("pbioroleA:\"unspecified role\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, server.query(new SolrQuery("pbioroleB:\"unspecified role\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, server.query(new SolrQuery("pbiorole:\"unspecified role\"")).getResults().getNumFound());
+
+        // test interactor type
+        Assert.assertEquals(4L, server.query(new SolrQuery("ptypeA:protein")).getResults().getNumFound());
+        Assert.assertEquals(4L, server.query(new SolrQuery("ptypeB:protein")).getResults().getNumFound());
+        Assert.assertEquals(4L, server.query(new SolrQuery("ptype:protein")).getResults().getNumFound());
+
+        // test interactor type
+        Assert.assertEquals(4L, server.query(new SolrQuery("ptypeA:protein")).getResults().getNumFound());
+        Assert.assertEquals(4L, server.query(new SolrQuery("ptypeB:protein")).getResults().getNumFound());
+        Assert.assertEquals(4L, server.query(new SolrQuery("ptype:protein")).getResults().getNumFound());
+
+        // test interactor xref
+        Assert.assertEquals(1L, server.query(new SolrQuery("pxrefA:\"GO:0008305\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, server.query(new SolrQuery("pxrefB:\"GO:0008305\"")).getResults().getNumFound());
+        Assert.assertEquals(2L, server.query(new SolrQuery("pxref:\"GO:0008305\"")).getResults().getNumFound());
+
+        // test interaction xref
+        Assert.assertEquals(1L, server.query(new SolrQuery("xref:\"IM-17229-4\"")).getResults().getNumFound());
+
+        // test interaction annotations
+        Assert.assertEquals(1L, server.query(new SolrQuery("annot:\"Fig. 1.\"")).getResults().getNumFound());
+
+        // test udate
+        Assert.assertEquals(1L, server.query(new SolrQuery("udate:[20120301 TO 20120302]")).getResults().getNumFound());
+
+        // test feature
+        Assert.assertEquals(1L, server.query(new SolrQuery("ftypeA:\"necessary binding region\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, server.query(new SolrQuery("ftypeB:\"necessary binding region\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, server.query(new SolrQuery("ftype:\"necessary binding region\"")).getResults().getNumFound());
+        Assert.assertEquals(0L, server.query(new SolrQuery("ftypeA:2171-2647")).getResults().getNumFound());
+
+        // test stc
+        Assert.assertEquals(0L, server.query(new SolrQuery("stc:true")).getResults().getNumFound());
+        Assert.assertEquals(4L, server.query(new SolrQuery("stc:false")).getResults().getNumFound());
+
+        // test participant detection method
+        Assert.assertEquals(1L, server.query(new SolrQuery("pmethodA:\"MI:0981\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, server.query(new SolrQuery("pmethodB:\"MI:0981\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, server.query(new SolrQuery("pmethod:\"MI:0981\"")).getResults().getNumFound());
+
+        // test bioeffect
+        Assert.assertEquals(4L, server.query(new SolrQuery("bioeffect:kinase activity")).getResults().getNumFound());
+        Assert.assertEquals(4L, server.query(new SolrQuery("bioeffectA:kinase activity")).getResults().getNumFound());
+        Assert.assertEquals(1L, server.query(new SolrQuery("bioeffectB:antioxidant activity")).getResults().getNumFound());
+        Assert.assertEquals(1L, server.query(new SolrQuery("bioeffect:\"GO:0016209\"")).getResults().getNumFound());
+
+        // test causalmechanism
+        Assert.assertEquals(4L, server.query(new SolrQuery("causalmechanism:\"post transcriptional regulation\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, server.query(new SolrQuery("causalmechanism:\"MI:2249\"")).getResults().getNumFound());
+
+        // test causalstatement
+        Assert.assertEquals(2L, server.query(new SolrQuery("causalstatement:down regulates")).getResults().getNumFound());
+        Assert.assertEquals(2L, server.query(new SolrQuery("causalstatement:up regulates")).getResults().getNumFound());
+        Assert.assertEquals(2L, server.query(new SolrQuery("causalstatement:\"MI:2235\"")).getResults().getNumFound());
+    }
+
+    @Test
     public void test_indexing_parameter() throws Exception, JobRestartException, JobExecutionAlreadyRunningException {
 
         solrMitabIndexer.startJob("mitabIndexParameterJob");
@@ -402,6 +518,157 @@ public class SolrMitabIndexerTest extends AbstractSolrServerTest {
         Collection<Object> pmethodB = doc.getFieldValues(SolrFieldName.pmethodB.toString()+"_o");
         Assert.assertEquals(1, pmethodB.size());
         Assert.assertEquals("psi-mi:\"MI:0396\"(predetermined participant)", pmethodB.iterator().next());
+    }
+
+    @Test
+    public void test_retrieve_results_mitab28_solr() throws Exception {
+
+        solrMitabIndexer.startJob("mitabIndexMitab28Job");
+
+        HttpSolrServer server = solrJettyRunner.getSolrServer();
+
+        SolrDocumentList results = server.query(new SolrQuery("idA:P07228")).getResults();
+        Assert.assertEquals(1, results.getNumFound());
+
+        Iterator<SolrDocument> iterator = results.iterator();
+        SolrDocument doc = iterator.next();
+
+        // MITAB25 columns
+        Collection<Object> idA = doc.getFieldValues(SolrFieldName.idA.toString()+"_o");
+        Assert.assertEquals(1, idA.size());
+        Assert.assertEquals("uniprotkb:P07228", idA.iterator().next());
+        Collection<Object> idB = doc.getFieldValues(SolrFieldName.idB.toString()+"_o");
+        Assert.assertEquals(1, idB.size());
+        Assert.assertEquals("uniprotkb:P21333", idB.iterator().next());
+        Collection<Object> altidA = doc.getFieldValues(SolrFieldName.altidA.toString()+"_o");
+        Assert.assertEquals(1, altidA.size());
+        Assert.assertEquals("intact:EBI-5606437", altidA.iterator().next());
+        Collection<Object> altidB = doc.getFieldValues(SolrFieldName.altidB.toString()+"_o");
+        Assert.assertEquals(1, altidB.size());
+        Assert.assertEquals("intact:EBI-350432", altidB.iterator().next());
+        Collection<Object> aliasA = doc.getFieldValues(SolrFieldName.aliasA.toString()+"_o");
+        Assert.assertEquals(1, aliasA.size());
+        Assert.assertEquals("uniprotkb:ITGB1(gene name)|uniprotkb:CSAT antigen(gene name synonym)|uniprotkb:JG22 antigen(gene name synonym)|uniprotkb:RGD-receptor(gene name synonym)", aliasA.iterator().next());
+        Collection<Object> aliasB = doc.getFieldValues(SolrFieldName.aliasB.toString()+"_o");
+        Assert.assertEquals(1, aliasB.size());
+        Assert.assertEquals("uniprotkb:FLNA(gene name)|uniprotkb:FLN(gene name synonym)|uniprotkb:FLN1(gene name synonym)|uniprotkb:Alpha-filamin(gene name synonym)|uniprotkb:Filamin-1(gene name synonym)|uniprotkb:Endothelial actin-binding protein(gene name synonym)|uniprotkb:Actin-binding protein 280(gene name synonym)|uniprotkb:Non-muscle filamin(gene name synonym)", aliasB.iterator().next());
+        Collection<Object> detmethod = doc.getFieldValues(SolrFieldName.detmethod.toString()+"_o");
+        Assert.assertEquals(1, detmethod.size());
+        Assert.assertEquals("psi-mi:\"MI:0411\"(enzyme linked immunosorbent assay)", detmethod.iterator().next());
+        Collection<Object> pubauth = doc.getFieldValues(SolrFieldName.pubauth.toString()+"_o");
+        Assert.assertNull(pubauth);
+        Collection<Object> pubid = doc.getFieldValues(SolrFieldName.pubid.toString()+"_o");
+        Assert.assertEquals(1, pubid.size());
+        Assert.assertEquals("pubmed:9722563|imex:IM-17229", pubid.iterator().next());
+        Collection<Object> taxidA = doc.getFieldValues(SolrFieldName.taxidA.toString()+"_o");
+        Assert.assertEquals(1, taxidA.size());
+        Assert.assertEquals("taxid:-1(in vitro)|taxid:-1(\"In vitro (In vitro)\")|taxid:9031(chick)|taxid:9031(\"Gallus gallus (Chicken)\")", taxidA.iterator().next());
+        Collection<Object> taxidB = doc.getFieldValues(SolrFieldName.taxidB.toString()+"_o");
+        Assert.assertEquals(1, taxidB.size());
+        Assert.assertEquals("taxid:9606(human)|taxid:9606(Homo sapiens)", taxidB.iterator().next());
+        Collection<Object> types = doc.getFieldValues(SolrFieldName.type.toString()+"_o");
+        Assert.assertEquals(1, types.size());
+        Assert.assertEquals("psi-mi:\"MI:0407\"(direct interaction)", types.iterator().next());
+        Collection<Object> source = doc.getFieldValues(SolrFieldName.source.toString()+"_o");
+        Assert.assertEquals(1, source.size());
+        Assert.assertEquals("psi-mi:\"MI:1124\"(mbinfo)", source.iterator().next());
+        Collection<Object> interaction_id = doc.getFieldValues(SolrFieldName.interaction_id.toString()+"_o");
+        Assert.assertEquals(1, interaction_id.size());
+        Assert.assertEquals("intact:EBI-5630468", interaction_id.iterator().next());
+        Collection<Object> confidence = doc.getFieldValues(SolrFieldName.confidence.toString()+"_o");
+        Assert.assertNull(confidence);
+
+        // MITAB26 extra columns
+        Collection<Object> complex = doc.getFieldValues(SolrFieldName.complex.toString()+"_o");
+        Assert.assertNull(complex);
+        Collection<Object> bioRoleA = doc.getFieldValues(SolrFieldName.pbioroleA.toString()+"_o");
+        Assert.assertEquals(1, bioRoleA.size());
+        Assert.assertEquals("psi-mi:\"MI:0499\"(unspecified role)", bioRoleA.iterator().next());
+        Collection<Object> bioRoleB = doc.getFieldValues(SolrFieldName.pbioroleB.toString()+"_o");
+        Assert.assertEquals(1, bioRoleB.size());
+        Assert.assertEquals("psi-mi:\"MI:0499\"(unspecified role)", bioRoleB.iterator().next());
+        Collection<Object> expRoleA = doc.getFieldValues(SolrFieldName.pexproleA.toString()+"_o");
+        Assert.assertEquals(1, expRoleA.size());
+        Assert.assertEquals("psi-mi:\"MI:0497\"(neutral component)", expRoleA.iterator().next());
+        Collection<Object> expRoleB = doc.getFieldValues(SolrFieldName.pexproleB.toString()+"_o");
+        Assert.assertEquals(1, expRoleB.size());
+        Assert.assertEquals("psi-mi:\"MI:0497\"(neutral component)", expRoleB.iterator().next());
+        Collection<Object> ptypeA = doc.getFieldValues(SolrFieldName.ptypeA.toString()+"_o");
+        Assert.assertEquals(1, ptypeA.size());
+        Assert.assertEquals("psi-mi:\"MI:0326\"(protein)", ptypeA.iterator().next());
+        Collection<Object> ptypeB = doc.getFieldValues(SolrFieldName.ptypeB.toString()+"_o");
+        Assert.assertEquals(1, ptypeB.size());
+        Assert.assertEquals("psi-mi:\"MI:0326\"(protein)", ptypeB.iterator().next());
+        Collection<Object> pxrefA = doc.getFieldValues(SolrFieldName.pxrefA.toString()+"_o");
+        Assert.assertEquals(1, pxrefA.size());
+        Assert.assertEquals("go:\"GO:0008305\"|go:\"GO:0042470\"|go:\"GO:0004872\"|go:\"GO:0007229\"|interpro:IPR013111|interpro:IPR015812|interpro:IPR014836|interpro:IPR002369|interpro:IPR012896|interpro:IPR003659|interpro:IPR016201|interpro:IPR002035|ipi:IPI00735136|go:\"GO:0007160\"|go:\"GO:0007275\"|go:\"GO:0005515\"", pxrefA.iterator().next());
+        Collection<Object> pxrefB = doc.getFieldValues(SolrFieldName.pxrefB.toString()+"_o");
+        Assert.assertEquals(1, pxrefB.size());
+        Assert.assertEquals("refseq:NP_001104026.1|refseq:NP_001447.2|interpro:IPR001589|interpro:IPR001715|interpro:IPR001298|interpro:IPR017868|interpro:IPR013783|interpro:IPR014756|go:\"GO:0015629\"|go:\"GO:0005938\"|go:\"GO:0005829\"|go:\"GO:0005576\"|go:\"GO:0005634\"|go:\"GO:0005886\"|go:\"GO:0051015\"|go:\"GO:0034988\"|go:\"GO:0001948\"|go:\"GO:0042803\"|go:\"GO:0048365\"|go:\"GO:0004871\"|go:\"GO:0008134\"|go:\"GO:0051764\"|go:\"GO:0031532\"|go:\"GO:0034329\"|go:\"GO:0051220\"|go:\"GO:0045184\"|go:\"GO:0007195\"|go:\"GO:0042177\"|go:\"GO:0043433\"|go:\"GO:0030168\"|go:\"GO:0002576\"|go:\"GO:0043123\"|go:\"GO:0042993\"|go:\"GO:0034394\"|go:\"GO:0050821\"|go:\"GO:0043113\"|ensembl:ENSG00000196924|ensembl:ENSG00000196924|reactome:REACT_604|ipi:IPI00302592|ipi:IPI00333541|rcsb pdb:2AAV|rcsb pdb:2BP3|rcsb pdb:2BRQ|rcsb pdb:2J3S|rcsb pdb:2JF1|rcsb pdb:2K3T|rcsb pdb:2K7P|rcsb pdb:2K7Q|rcsb pdb:2W0P|rcsb pdb:2WFN|rcsb pdb:3CNK|rcsb pdb:3HOC|rcsb pdb:3HOP|rcsb pdb:3HOR|rcsb pdb:3ISW|rcsb pdb:3RGH|go:\"GO:0031523\"|go:\"GO:0090307\"|uniprotkb:Q8NF52(secondary-ac)|intact:EBI-1103234(intact-secondary)|uniprotkb:Q5HY53(secondary-ac)|uniprotkb:Q5HY55(secondary-ac)|reactome:REACT_111155|go:\"GO:0017160\"", pxrefB.iterator().next());
+        Collection<Object> xref = doc.getFieldValues(SolrFieldName.xref.toString()+"_o");
+        Assert.assertEquals(1, xref.size());
+        Assert.assertEquals("imex:IM-17229-4(imex-primary)", xref.iterator().next());
+        Collection<Object> annotA = doc.getFieldValues(SolrFieldName.annotA.toString()+"_o");
+        Assert.assertNull(annotA);
+        Collection<Object> annotB = doc.getFieldValues(SolrFieldName.annotB.toString()+"_o");
+        Assert.assertNull(annotB);
+        Collection<Object> annot = doc.getFieldValues(SolrFieldName.annot.toString()+"_o");
+        Assert.assertEquals(1, annot.size());
+        Assert.assertEquals("curation depth:imex curation|full coverage:Only protein-protein interactions|figure legend:Fig. 1.|isoform-comment:The human filamin consists of three isoforms. The protein included in this entry is filamin A.", annot.iterator().next());
+        Collection<Object> host = doc.getFieldValues(SolrFieldName.taxidHost.toString()+"_o");
+        Assert.assertNull(host);
+        Collection<Object> parameter = doc.getFieldValues(SolrFieldName.param.toString()+"_o");
+        Assert.assertNull(parameter);
+        Collection<Object> created = doc.getFieldValues(SolrFieldName.cdate.toString()+"_o");
+        Assert.assertEquals(1, created.size());
+        Assert.assertEquals("2012/02/23", created.iterator().next());
+        Collection<Object> updated = doc.getFieldValues(SolrFieldName.udate.toString()+"_o");
+        Assert.assertEquals(1, updated.size());
+        Assert.assertEquals("2012/02/28", updated.iterator().next());
+        Collection<Object> checksumA = doc.getFieldValues(SolrFieldName.checksumA.toString()+"_o");
+        Assert.assertEquals(1, checksumA.size());
+        Assert.assertEquals("crc64:2F6FEFCDF2C80457", checksumA.iterator().next());
+        Collection<Object> checksumB = doc.getFieldValues(SolrFieldName.checksumB.toString()+"_o");
+        Assert.assertEquals(1, checksumB.size());
+        Assert.assertEquals("crc64:6C1A07041DF50142", checksumB.iterator().next());
+        Collection<Object> checksum = doc.getFieldValues(SolrFieldName.checksumI.toString()+"_o");
+        Assert.assertEquals(1, checksum.size());
+        Assert.assertEquals("intact-crc:E055218524512ECD", checksum.iterator().next());
+        Collection<Object> negative = doc.getFieldValues(SolrFieldName.negative.toString()+"_o");
+        Assert.assertEquals(1, negative.size());
+        Assert.assertEquals(false, Boolean.parseBoolean(negative.iterator().next().toString()));
+
+        // MITAB27 extra columns
+        Collection<Object> ftypeA = doc.getFieldValues(SolrFieldName.ftypeA.toString()+"_o");
+        Assert.assertEquals(1, ftypeA.size());
+        Assert.assertEquals("sufficient binding region:757-803", ftypeA.iterator().next());
+        Collection<Object> ftypeB = doc.getFieldValues(SolrFieldName.ftypeB.toString()+"_o");
+        Assert.assertEquals(1, ftypeB.size());
+        Assert.assertEquals("sufficient binding region:2171-2647|his tag:?-?", ftypeB.iterator().next());
+        Collection<Object> stcA = doc.getFieldValues(SolrFieldName.stcA.toString()+"_o");
+        Assert.assertNull(stcA);
+        Collection<Object> stcB = doc.getFieldValues(SolrFieldName.stcB.toString()+"_o");
+        Assert.assertNull(stcB);
+        Collection<Object> pmethodA = doc.getFieldValues(SolrFieldName.pmethodA.toString()+"_o");
+        Assert.assertEquals(1, pmethodA.size());
+        Assert.assertEquals("psi-mi:\"MI:0981\"(tag visualisation by peroxidase activity)", pmethodA.iterator().next());
+        Collection<Object> pmethodB = doc.getFieldValues(SolrFieldName.pmethodB.toString()+"_o");
+        Assert.assertEquals(1, pmethodB.size());
+        Assert.assertEquals("psi-mi:\"MI:0981\"(tag visualisation by peroxidase activity)", pmethodB.iterator().next());
+
+        // MITAB28 extra columns
+        Collection<Object> bioeffectA = doc.getFieldValues(SolrFieldName.bioeffectA.toString() + "_o");
+        Assert.assertEquals(1, bioeffectA.size());
+        Assert.assertEquals("go:\"GO:0016301\"(kinase activity)", bioeffectA.iterator().next());
+        Collection<Object> bioeffectB = doc.getFieldValues(SolrFieldName.bioeffectB.toString() + "_o");
+        Assert.assertEquals(1, bioeffectB.size());
+        Assert.assertEquals("go:\"GO:0016301\"(kinase activity)", bioeffectA.iterator().next());
+        Collection<Object> causalMechanism = doc.getFieldValues(SolrFieldName.causalmechanism.toString() + "_o");
+        Assert.assertEquals(1, causalMechanism.size());
+        Assert.assertEquals("psi-mi:\"MI:2249\"(post transcriptional regulation)", causalMechanism.iterator().next());
+        Collection<Object> causalStatement = doc.getFieldValues(SolrFieldName.causalstatement.toString() + "_o");
+        Assert.assertEquals(1, causalStatement.size());
+        Assert.assertEquals("psi-mi:\"MI:2235\"(up regulates)", causalStatement.iterator().next());
     }
 
     @Test
