@@ -79,6 +79,8 @@ public class PsicquicSearchResults {
         return numberResults;
     }
 
+    public SolrDocumentList getResults() { return results; }
+
     public EntrySet createEntrySet() throws PsimiTabException, IOException, XmlConversionException, IllegalAccessException {
         if (this.numberResults == 0 || this.results.size() == 0) {
             return new EntrySet();
