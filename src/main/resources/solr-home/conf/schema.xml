@@ -130,7 +130,7 @@
         <field name="stc" 			type="miqlBoolean"  default="false"/>
         <field name="param" 		type="miqlBoolean"  default="false"/>
 
-        <!-- MIQL 2.8 indexed and stored fields !-->
+        <!-- MIQL 2.8 indexed and stored fields http://psicquic.github.io/MiqlReference28.html -->
         <field name="bioeffectA" 		type="miqlText" 	default="-"/>
         <field name="bioeffectB" 		type="miqlText" 	default="-"/>
         <field name="bioeffect"			type="miqlText" 	default=""/> <!-- bioeffect = bioeffectA + bioeffectB -->
