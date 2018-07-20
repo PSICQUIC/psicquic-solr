@@ -42,6 +42,14 @@
         <property name="resource" ref="mitabFileConfidenceTest"/>
     </bean>
 
+    <bean id="mitab28FileTest" class="org.springframework.core.io.FileSystemResource">
+        <constructor-arg value="src/test/resources/samples/sampleFileMitab28.txt"/>
+    </bean>
+
+    <bean id="mitabReaderMitab28Test" class="org.hupo.psi.mi.psicquic.indexing.batch.reader.MitabCalimochoReader">
+        <property name="resource" ref="mitab28FileTest"/>
+    </bean>
+
     <!-- writer -->
 
     <bean id="solrWriterTest" class="org.hupo.psi.mi.psicquic.indexing.batch.writer.SolrItemWriter">
@@ -81,6 +89,26 @@
                          retry-limit="10" commit-interval="2">
                 <batch:streams>
                     <batch:stream ref="mitabReaderNegativeTest"/>
+                    <batch:stream ref="solrWriterTest"/>
+                </batch:streams>
+
+                <batch:retryable-exception-classes>
+                    <batch:include class="org.apache.solr.client.solrj.SolrServerException"/>
+                </batch:retryable-exception-classes>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+    <batch:step id="solrIndexingMitab28StepTest" parent="batchStep">
+        <batch:tasklet>
+            <batch:listeners>
+                <batch:listener ref="simpleChunkListener" />
+            </batch:listeners>
+
+            <batch:chunk reader="mitabReaderMitab28Test"
+                         writer="solrWriterTest"
+                         retry-limit="10" commit-interval="2">
+                <batch:streams>
+                    <batch:stream ref="mitabReaderMitab28Test"/>
                     <batch:stream ref="solrWriterTest"/>
                 </batch:streams>
 
@@ -246,8 +274,7 @@
         </batch:step>
         <batch:step id="indexSolrStepTest4" parent="solrIndexingFailedStepTest"/>
     </batch:job>
-
-    <batch:job id="mitabIndexRetryJob" job-repository="jobRepository" parent="batchJob">
+    <batch:job id="mitabIndexMitab28Job" job-repository="jobRepository" parent="batchJob">
 
         <batch:listeners>
             <batch:listener>
@@ -259,6 +286,21 @@
             <batch:end on="FAILED"/>
             <batch:next on="*" to="indexSolrStepTest5"/>
         </batch:step>
-        <batch:step id="indexSolrStepTest5" parent="solrIndexingRetryStepTest"/>
+        <batch:step id="indexSolrStepTest5" parent="solrIndexingMitab28StepTest"/>
+    </batch:job>
+
+    <batch:job id="mitabIndexRetryJob" job-repository="jobRepository" parent="batchJob">
+
+        <batch:listeners>
+            <batch:listener>
+                <bean class="org.hupo.psi.mi.psicquic.indexing.batch.listener.PsicquicJobExecutionListener"/>
+            </batch:listener>
+        </batch:listeners>
+
+        <batch:step id="cleanSolrTest6"  parent="cleanSolrStepTest">
+            <batch:end on="FAILED"/>
+            <batch:next on="*" to="indexSolrStepTest6"/>
+        </batch:step>
+        <batch:step id="indexSolrStepTest6" parent="solrIndexingRetryStepTest"/>
     </batch:job>
 </beans>
