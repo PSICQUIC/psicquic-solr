@@ -236,9 +236,9 @@ public class SolrMitabIndexerTest extends AbstractSolrServerTest {
         Assert.assertEquals(1L, server.query(new SolrQuery("pmethod:\"MI:0981\"")).getResults().getNumFound());
 
         // test bioeffect
-        Assert.assertEquals(4L, server.query(new SolrQuery("bioeffect:kinase activity")).getResults().getNumFound());
-        Assert.assertEquals(4L, server.query(new SolrQuery("bioeffectA:kinase activity")).getResults().getNumFound());
-        Assert.assertEquals(1L, server.query(new SolrQuery("bioeffectB:antioxidant activity")).getResults().getNumFound());
+        Assert.assertEquals(4L, server.query(new SolrQuery("bioeffect:\"kinase activity\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, server.query(new SolrQuery("bioeffectA:\"kinase activity\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, server.query(new SolrQuery("bioeffectB:\"antioxidant activity\"")).getResults().getNumFound());
         Assert.assertEquals(1L, server.query(new SolrQuery("bioeffect:\"GO:0016209\"")).getResults().getNumFound());
 
         // test causalmechanism
@@ -246,8 +246,8 @@ public class SolrMitabIndexerTest extends AbstractSolrServerTest {
         Assert.assertEquals(4L, server.query(new SolrQuery("causalmechanism:\"MI:2249\"")).getResults().getNumFound());
 
         // test causalstatement
-        Assert.assertEquals(2L, server.query(new SolrQuery("causalstatement:down regulates")).getResults().getNumFound());
-        Assert.assertEquals(2L, server.query(new SolrQuery("causalstatement:up regulates")).getResults().getNumFound());
+        Assert.assertEquals(2L, server.query(new SolrQuery("causalstatement:\"down regulates\"")).getResults().getNumFound());
+        Assert.assertEquals(2L, server.query(new SolrQuery("causalstatement:\"up regulates\"")).getResults().getNumFound());
         Assert.assertEquals(2L, server.query(new SolrQuery("causalstatement:\"MI:2235\"")).getResults().getNumFound());
     }
 
