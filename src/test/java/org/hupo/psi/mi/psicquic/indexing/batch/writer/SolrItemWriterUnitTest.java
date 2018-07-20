@@ -22,9 +22,9 @@ public class SolrItemWriterUnitTest extends AbstractSolrServerTest {
 
     @Test
     public void test_write_mitab27_row() throws Exception {
-        String solrUr= "http://127.0.0.1:18080/solr";
+        String solrURL= "http://127.0.0.1:18080/solr";
         SolrItemWriter writer = new SolrItemWriter();
-        writer.setSolrUrl(solrUr);
+        writer.setSolrUrl(solrURL);
 
         // add some data to the solrServer using writer
         MitabCalimochoLineMapper mitabLineMapper = new MitabCalimochoLineMapper();
@@ -44,9 +44,9 @@ public class SolrItemWriterUnitTest extends AbstractSolrServerTest {
 
     @Test
     public void test_write_diff_mitab_version_rows() throws Exception {
-        String solrUr= "http://127.0.0.1:18080/solr";
+        String solrURL= "http://127.0.0.1:18080/solr";
         SolrItemWriter writer = new SolrItemWriter();
-        writer.setSolrUrl(solrUr);
+        writer.setSolrUrl(solrURL);
 
         // add some data to the solrServer using writer
         MitabCalimochoLineMapper mitabLineMapper = new MitabCalimochoLineMapper();
