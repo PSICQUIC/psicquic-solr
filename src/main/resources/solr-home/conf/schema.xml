@@ -45,7 +45,7 @@
     that avoids logging every request
 -->
 
-<schema name="psiqcuic-schema-2.7" version="1.5">
+<schema name="psiqcuic-schema-2.8" version="1.5">
 
     <types>
         <fieldType name="miqlUuid" 					class="solr.UUIDField" 		indexed="true" stored="true" required="true"/>
