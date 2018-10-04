@@ -17,9 +17,9 @@
 
     <properties>
         <solr.url>http://127.0.0.1:8983/solr</solr.url>
-        <calimocho.version>2.5.3-SNAPSHOT</calimocho.version>
+        <calimocho.version>2.5.3</calimocho.version>
         <!--Latest version. Frozen project-->
-        <psimi.version>1.8.6-SNAPSHOT</psimi.version>
+        <psimi.version>1.8.6</psimi.version>
         <spring.version>3.2.2.RELEASE</spring.version>
     </properties>
 
