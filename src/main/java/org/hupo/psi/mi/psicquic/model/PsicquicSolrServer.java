@@ -35,6 +35,7 @@ public class PsicquicSolrServer {
     public static final String RETURN_TYPE_MITAB25 = "psi-mi/tab25";
     public static final String RETURN_TYPE_MITAB26 = "psi-mi/tab26";
     public static final String RETURN_TYPE_MITAB27 = "psi-mi/tab27";
+    public static final String RETURN_TYPE_MITAB28 = "psi-mi/tab28";
     public static final String RETURN_TYPE_COUNT = "count";
     public static final String RETURN_TYPE_DEFAULT = RETURN_TYPE_MITAB25;
     private final static String DISMAX_PARAM_NAME = "qf";
@@ -98,6 +99,25 @@ public class PsicquicSolrServer {
             SolrFieldName.pmethodB+STORED_FIELD_EXTENSION
     };
 
+    public static String[] DATA_FIELDS_28 = new String[] {
+            SolrFieldName.idA+STORED_FIELD_EXTENSION, SolrFieldName.idB+STORED_FIELD_EXTENSION, SolrFieldName.altidA+STORED_FIELD_EXTENSION,
+            SolrFieldName.altidB+STORED_FIELD_EXTENSION, SolrFieldName.aliasA+STORED_FIELD_EXTENSION, SolrFieldName.aliasB+STORED_FIELD_EXTENSION,
+            SolrFieldName.detmethod+STORED_FIELD_EXTENSION, SolrFieldName.pubauth+STORED_FIELD_EXTENSION, SolrFieldName.pubid+STORED_FIELD_EXTENSION,
+            SolrFieldName.taxidA+STORED_FIELD_EXTENSION, SolrFieldName.taxidB+STORED_FIELD_EXTENSION, SolrFieldName.type+STORED_FIELD_EXTENSION,
+            SolrFieldName.source+STORED_FIELD_EXTENSION,SolrFieldName.interaction_id+STORED_FIELD_EXTENSION, SolrFieldName.confidence+STORED_FIELD_EXTENSION,
+            SolrFieldName.complex+STORED_FIELD_EXTENSION, SolrFieldName.pbioroleA+STORED_FIELD_EXTENSION, SolrFieldName.pbioroleB+STORED_FIELD_EXTENSION,
+            SolrFieldName.pexproleA+STORED_FIELD_EXTENSION, SolrFieldName.pexproleB+STORED_FIELD_EXTENSION, SolrFieldName.ptypeA+STORED_FIELD_EXTENSION,
+            SolrFieldName.ptypeB+STORED_FIELD_EXTENSION, SolrFieldName.pxrefA+STORED_FIELD_EXTENSION, SolrFieldName.pxrefB+STORED_FIELD_EXTENSION,
+            SolrFieldName.xref+STORED_FIELD_EXTENSION, SolrFieldName.annotA+STORED_FIELD_EXTENSION,
+            SolrFieldName.annotB+STORED_FIELD_EXTENSION, SolrFieldName.annot+STORED_FIELD_EXTENSION, SolrFieldName.taxidHost+STORED_FIELD_EXTENSION,
+            SolrFieldName.param+STORED_FIELD_EXTENSION, SolrFieldName.cdate+STORED_FIELD_EXTENSION, SolrFieldName.udate+STORED_FIELD_EXTENSION,
+            SolrFieldName.checksumA+STORED_FIELD_EXTENSION, SolrFieldName.checksumB+STORED_FIELD_EXTENSION, SolrFieldName.checksumI+STORED_FIELD_EXTENSION,
+            SolrFieldName.negative+STORED_FIELD_EXTENSION, SolrFieldName.ftypeA+STORED_FIELD_EXTENSION, SolrFieldName.ftypeB+STORED_FIELD_EXTENSION,
+            SolrFieldName.stcA+STORED_FIELD_EXTENSION, SolrFieldName.stcB+STORED_FIELD_EXTENSION, SolrFieldName.pmethodA+STORED_FIELD_EXTENSION,
+            SolrFieldName.pmethodB+STORED_FIELD_EXTENSION, SolrFieldName.bioeffectA+STORED_FIELD_EXTENSION, SolrFieldName.bioeffectB+STORED_FIELD_EXTENSION,
+            SolrFieldName.causalmechanism+STORED_FIELD_EXTENSION, SolrFieldName.causalstatement+STORED_FIELD_EXTENSION
+    };
+
     public PsicquicSolrServer(SolrServer solrServer){
         this.solrServer = solrServer;
 
@@ -116,10 +136,11 @@ public class PsicquicSolrServer {
      * Associates for each format the fields that are expected to be returned
      */
     protected void initializeSolrFieldsMap(){
-        solrFields = new HashMap<String, String[]>(5);
+        solrFields = new HashMap<String, String[]>(6);
         solrFields.put(RETURN_TYPE_MITAB25, DATA_FIELDS_25);
         solrFields.put(RETURN_TYPE_MITAB26, DATA_FIELDS_26);
         solrFields.put(RETURN_TYPE_MITAB27, DATA_FIELDS_27);
+        solrFields.put(RETURN_TYPE_MITAB28, DATA_FIELDS_28);
         solrFields.put(RETURN_TYPE_XML25, DATA_FIELDS_27);
         solrFields.put(RETURN_TYPE_COUNT, new String[] {});
     }
@@ -151,10 +172,12 @@ public class PsicquicSolrServer {
 
         // use dismax parser for querying default fields
         //solrQuery.setParam(DISMAX_PARAM_NAME, SolrFieldName.identifier.toString(), SolrFieldName.pubid.toString(), SolrFieldName.pubauth.toString(), SolrFieldName.species.toString(), SolrFieldName.detmethod.toString(), SolrFieldName.type.toString(), SolrFieldName.interaction_id.toString());
-        solrQuery.setParam(DISMAX_PARAM_NAME, SolrFieldName.identifier.toString()+" "+SolrFieldName.pubid.toString()+" "
-                +SolrFieldName.pubauth.toString()+" "+SolrFieldName.species.toString()+" "+SolrFieldName.detmethod.toString()
-                +" "+SolrFieldName.type.toString()+" "+SolrFieldName.interaction_id.toString()+" "+SolrFieldName.xref.toString()
-                +" "+SolrFieldName.pxref.toString());
+        solrQuery.setParam(DISMAX_PARAM_NAME, SolrFieldName.identifier.toString() + " "
+                + SolrFieldName.pubid.toString() + " " + SolrFieldName.pubauth.toString() + " "
+                + SolrFieldName.species.toString() + " " + SolrFieldName.detmethod.toString() + " "
+                + SolrFieldName.type.toString() + " " + SolrFieldName.interaction_id.toString() + " "
+                + SolrFieldName.xref.toString() + " " + SolrFieldName.pxref.toString() + " "
+                + SolrFieldName.bioeffect.toString() + " " + SolrFieldName.causalstatement.toString());
         solrQuery.setParam(QUERY_TYPE, DISMAX_TYPE);
         solrQuery.setParam(DEFAULT_MM_PARAM, "1");
 
@@ -224,10 +247,13 @@ public class PsicquicSolrServer {
 
         // use dismax parser for querying default fields
         //solrQuery.setParam(DISMAX_PARAM_NAME, SolrFieldName.identifier.toString(), SolrFieldName.pubid.toString(), SolrFieldName.pubauth.toString(), SolrFieldName.species.toString(), SolrFieldName.detmethod.toString(), SolrFieldName.type.toString(), SolrFieldName.interaction_id.toString());
-        solrQuery.setParam(DISMAX_PARAM_NAME, SolrFieldName.identifier.toString()+" "+SolrFieldName.pubid.toString()+" "
-                +SolrFieldName.pubauth.toString()+" "+SolrFieldName.species.toString()+" "+SolrFieldName.detmethod.toString()
-                +" "+SolrFieldName.type.toString()+" "+SolrFieldName.interaction_id.toString()+" "+SolrFieldName.xref.toString()
-                +" "+SolrFieldName.pxref.toString());        solrQuery.setParam(QUERY_TYPE, DISMAX_TYPE);
+        solrQuery.setParam(DISMAX_PARAM_NAME, SolrFieldName.identifier.toString() + " "
+                + SolrFieldName.pubid.toString() + " " + SolrFieldName.pubauth.toString() + " "
+                + SolrFieldName.species.toString() + " " + SolrFieldName.detmethod.toString() + " "
+                + SolrFieldName.type.toString() + " " + SolrFieldName.interaction_id.toString() + " "
+                + SolrFieldName.xref.toString() + " " + SolrFieldName.pxref.toString() + " "
+                + SolrFieldName.bioeffect.toString() + " " + SolrFieldName.causalstatement.toString());
+        solrQuery.setParam(QUERY_TYPE, DISMAX_TYPE);
         solrQuery.setParam(DEFAULT_MM_PARAM, "1");
 
         // set first result
@@ -331,7 +357,8 @@ public class PsicquicSolrServer {
                     if (token.startsWith("idA:") || token.startsWith("idB:") || token.startsWith("taxidA:") || token.startsWith("taxidB:")
                             || token.startsWith("pbioroleA:") || token.startsWith("pbioroleB:") || token.startsWith("ptypeA:")
                             || token.startsWith("ptypeB:") || token.startsWith("pxrefA:") || token.startsWith("pxrefB:")
-                            || token.startsWith("ftypeA:") || token.startsWith("ftypeB:") || token.startsWith("pmethodA:") || token.startsWith("pmethodA:")){
+                            || token.startsWith("ftypeA:") || token.startsWith("ftypeB:") || token.startsWith("pmethodA:")
+                            || token.startsWith("pmethodB:") || token.startsWith("bioeffectA") || token.startsWith("bioeffectB")) {
 
                         int firstIndex = token.indexOf(":");
                         String prefix = token.substring(0, firstIndex+1);
@@ -358,7 +385,7 @@ public class PsicquicSolrServer {
                 .replaceAll(" not ", " NOT ")
                 .replaceAll("^not ", "NOT "));
 
-        // By default filter negative interactions. If a neagtive field is specified in the query, then the filter which excludes negative
+        // By default filter negative interactions. If a negative field is specified in the query, then the filter which excludes negative
         // interactions is removed
         if (!containsNegativeFilter(copy) || returnType == null || (returnType != null && RETURN_TYPE_MITAB25.equals(returnType))){
             copy.addFilterQuery(SolrFieldName.negative+":false");

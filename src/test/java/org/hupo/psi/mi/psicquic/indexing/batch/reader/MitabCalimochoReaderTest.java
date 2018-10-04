@@ -16,22 +16,6 @@ import org.springframework.core.io.FileSystemResource;
 public class MitabCalimochoReaderTest {
 
     @Test
-    public void read_mitab_27() throws Exception {
-
-        MitabCalimochoReader reader = new MitabCalimochoReader();
-        reader.setResource(new FileSystemResource(MitabCalimochoReader.class.getResource("/samples/sampleFileNegative.txt").getFile()));
-
-        reader.doOpen();
-
-        Row row = reader.read();
-
-        reader.close();
-
-        Assert.assertNotNull(row);
-        Assert.assertEquals(139, row.getAllFields().size());
-    }
-
-    @Test
     public void read_mitab_25() throws Exception {
 
         MitabCalimochoReader reader = new MitabCalimochoReader();
@@ -62,5 +46,37 @@ public class MitabCalimochoReaderTest {
         Assert.assertNotNull(row);
         Assert.assertEquals(125, row.getAllFields().size());
 
+    }
+
+    @Test
+    public void read_mitab_27() throws Exception {
+
+        MitabCalimochoReader reader = new MitabCalimochoReader();
+        reader.setResource(new FileSystemResource(MitabCalimochoReader.class.getResource("/samples/sampleFileMitab27.txt").getFile()));
+
+        reader.doOpen();
+
+        Row row = reader.read();
+
+        reader.close();
+
+        Assert.assertNotNull(row);
+        Assert.assertEquals(139, row.getAllFields().size());
+    }
+
+    @Test
+    public void read_mitab_28() throws Exception {
+
+        MitabCalimochoReader reader = new MitabCalimochoReader();
+        reader.setResource(new FileSystemResource(MitabCalimochoReader.class.getResource("/samples/sampleFileMitab28.txt").getFile()));
+
+        reader.doOpen();
+
+        Row row = reader.read();
+
+        reader.close();
+
+        Assert.assertNotNull(row);
+        Assert.assertEquals(143, row.getAllFields().size());
     }
 }

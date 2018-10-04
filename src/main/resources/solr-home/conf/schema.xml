@@ -45,7 +45,7 @@
     that avoids logging every request
 -->
 
-<schema name="psiqcuic-schema-2.7" version="1.5">
+<schema name="psiqcuic-schema-2.8" version="1.5">
 
     <types>
         <fieldType name="miqlUuid" 					class="solr.UUIDField" 		indexed="true" stored="true" required="true"/>
@@ -85,64 +85,71 @@
         <field name="uuId"  type="miqlUuid" default="NEW"/>
         <field name="recId" type="miqlUnindexedStoredString" default="-"/>
 
-        <!-- MIQL 2.5 indexed and stored fields specification http://code.google.com/p/psicquic/wiki/MiqlReference-->
+        <!-- MIQL 2.5 indexed and stored fields specification http://psicquic.github.io/MiqlReference.html -->
         <field name="idA"			type="miqlText" default="-"/>
         <field name="idB"			type="miqlText" default="-"/>
         <field name="id" 			type="miqlText" default=""/> <!-- id = idA+altA+idB+altB -->
-        <field name="alias" 			type="miqlText" default=""/> <!-- alias = aliasA+aliasB -->
+        <field name="alias" 		type="miqlText" default=""/> <!-- alias = aliasA+aliasB -->
         <field name="identifier" 	type="miqlText" default=""/> <!-- identifier = id + alias -->
         <field name="pubauth"		type="miqlText" default="-"/>
         <field name="pubid"			type="miqlText" default="-"/>
-        <field name="taxidA"			type="miqlText" default="-"/>
-        <field name="taxidB"			type="miqlText" default="-"/>
+        <field name="taxidA"		type="miqlText" default="-"/>
+        <field name="taxidB"		type="miqlText" default="-"/>
         <field name="species" 		type="miqlText" default=""/> <!-- species = taxidA + taxidB -->
         <field name="type" 			type="miqlText" default="-"/>
         <field name="detmethod"		type="miqlText" default="-"/>
         <field name="interaction_id"	type="miqlText" default="-"/>
 
         <!-- MIQL 2.5 dummy fields used as input for 2.5 copy fields -->
-        <field name="altidA"			type="miqlDummyField" default="-"/>
-        <field name="altidB"			type="miqlDummyField" default="-"/>
-        <field name="aliasA"			type="miqlDummyField" default="-"/>
-        <field name="aliasB"			type="miqlDummyField" default="-"/>
+        <field name="altidA"		type="miqlDummyField" default="-"/>
+        <field name="altidB"		type="miqlDummyField" default="-"/>
+        <field name="aliasA"		type="miqlDummyField" default="-"/>
+        <field name="aliasB"		type="miqlDummyField" default="-"/>
 
-        <!-- MIQL 2.7 indexed and stored fields http://code.google.com/p/psicquic/wiki/MiqlReference27 -->
+        <!-- MIQL 2.7 indexed and stored fields http://psicquic.github.io/MiqlReference27.html -->
         <field name="complex" 		type="miqlText" 	default="-"/>
-        <field name="pbioroleA" 		type="miqlText" 	default="-"/>
-        <field name="pbioroleB" 		type="miqlText"		default="-"/>
+        <field name="pbioroleA" 	type="miqlText" 	default="-"/>
+        <field name="pbioroleB" 	type="miqlText"		default="-"/>
         <field name="pbiorole" 		type="miqlText" 	default=""/> <!-- pbiorole = pbioroleA + pbioroleB -->
         <field name="ptypeA" 		type="miqlText" 	default="-"/>
         <field name="ptypeB" 		type="miqlText" 	default="-"/>
-        <field name="ptype" 			type="miqlText" 	default=""/> <!-- ptype = ptypeA + ptypeB -->
+        <field name="ptype" 		type="miqlText" 	default=""/> <!-- ptype = ptypeA + ptypeB -->
         <field name="pxrefA" 		type="miqlText" 	default="-"/>
         <field name="pxrefB" 		type="miqlText" 	default="-"/>
-        <field name="pxref" 			type="miqlText" 	default=""/> <!-- pxref = pxrefA + pxrefB -->
+        <field name="pxref" 		type="miqlText" 	default=""/> <!-- pxref = pxrefA + pxrefB -->
         <field name="xref" 			type="miqlText" 	default="-"/>
-        <field name="annot" 			type="miqlText" 	default=""/>
-        <field name="udate" 			type="miqlInt"  	default="0"/>
+        <field name="annot" 		type="miqlText" 	default=""/>
+        <field name="udate" 		type="miqlInt"  	default="0"/>
         <field name="negative" 		type="miqlBoolean" 	default="false"/>
         <field name="ftypeA" 		type="miqlText" 	default="-"/>
         <field name="ftypeB" 		type="miqlText" 	default="-"/>
-        <field name="ftype" 			type="miqlText" 	default=""/> <!-- ftype = ftypeA + ftypeB -->
+        <field name="ftype" 		type="miqlText" 	default=""/> <!-- ftype = ftypeA + ftypeB -->
         <field name="pmethodA"		type="miqlText" 	default="-"/>
         <field name="pmethodB" 		type="miqlText" 	default="-"/>
         <field name="pmethod" 		type="miqlText" 	default=""/> <!-- pmethod = pmethodA + pmethodB -->
         <field name="stc" 			type="miqlBoolean"  default="false"/>
-        <field name="param" 			type="miqlBoolean"  default="false"/>
+        <field name="param" 		type="miqlBoolean"  default="false"/>
+
+        <!-- MIQL 2.8 indexed and stored fields http://psicquic.github.io/MiqlReference28.html -->
+        <field name="bioeffectA" 		type="miqlText" 	default="-"/>
+        <field name="bioeffectB" 		type="miqlText" 	default="-"/>
+        <field name="bioeffect"			type="miqlText" 	default=""/> <!-- bioeffect = bioeffectA + bioeffectB -->
+        <field name="causalmechanism"	type="miqlText" 	default="-"/>
+        <field name="causalstatement" 	type="miqlText" 	default="-"/>
 
         <!-- Dynamic Stored Fields that can be used for faceting/sorting -->
         <dynamicField name="*_s"  type="miqlIndexedUnstoredString" default="-"/>
         <dynamicField name="*_o"  type="miqlUnindexedStoredString" default="-"/>
     </fields>
 
-    <copyField source="idA" 		dest="id"/>
-    <copyField source="idB" 		dest="id"/>
+    <copyField source="idA" 	dest="id"/>
+    <copyField source="idB" 	dest="id"/>
     <copyField source="altidA" 	dest="id"/>
     <copyField source="altidB" 	dest="id"/>
     <copyField source="aliasA" 	dest="alias"/>
     <copyField source="aliasB" 	dest="alias"/>
-    <copyField source="idA" 		dest="identifier"/>
-    <copyField source="idB" 		dest="identifier"/>
+    <copyField source="idA" 	dest="identifier"/>
+    <copyField source="idB" 	dest="identifier"/>
     <copyField source="altidA" 	dest="identifier"/>
     <copyField source="altidB" 	dest="identifier"/>
     <copyField source="aliasA" 	dest="identifier"/>
@@ -159,6 +166,8 @@
     <copyField source="ftypeB" 	dest="ftype"/>
     <copyField source="pmethodA" 	dest="pmethod"/>
     <copyField source="pmethodB" 	dest="pmethod"/>
+    <copyField source="bioeffectA" 	dest="bioeffect"/>
+    <copyField source="bioeffectB" 	dest="bioeffect"/>
 
     <copyField source="idA_s" 		dest="id_s"/>
     <copyField source="idB_s" 		dest="id_s"/>
@@ -174,8 +183,8 @@
     <copyField source="aliasB_s" 	dest="identifier_s"/>
     <copyField source="taxidA_s" 	dest="species_s"/>
     <copyField source="taxidB_s" 	dest="species_s"/>
-    <copyField source="pbioroleA_s" 	dest="pbiorole_s"/>
-    <copyField source="pbioroleB_s" 	dest="pbiorole_s"/>
+    <copyField source="pbioroleA_s" dest="pbiorole_s"/>
+    <copyField source="pbioroleB_s" dest="pbiorole_s"/>
     <copyField source="ptypeA_s" 	dest="ptype_s"/>
     <copyField source="ptypeB_s" 	dest="ptype_s"/>
     <copyField source="pxrefA_s" 	dest="pxref_s"/>
