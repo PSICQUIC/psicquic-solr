@@ -3,8 +3,9 @@
 
     <groupId>org.hupo.psi.mi.psicquic</groupId>
     <artifactId>psicquic-solr</artifactId>
-    <version>1.4.1-SNAPSHOT</version>
     <packaging>jar</packaging>
+
+    <version>1.4.1-SNAPSHOT</version>
 
     <name>PSI :: PSICQUIC Solr</name>
 
@@ -17,6 +18,7 @@
 
     <properties>
         <solr.url>http://127.0.0.1:8983/solr</solr.url>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <calimocho.version>2.5.3</calimocho.version>
         <!--Latest version. Frozen project-->
         <psimi.version>1.8.6</psimi.version>
