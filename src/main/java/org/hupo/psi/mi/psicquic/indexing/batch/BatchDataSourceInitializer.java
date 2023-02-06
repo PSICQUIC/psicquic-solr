@@ -42,7 +42,7 @@ public class BatchDataSourceInitializer implements org.springframework.beans.fac
     private boolean initialized = false;
 
     /**
-     * @throws Throwable
+     * @throws Throwable if anything
      * @see java.lang.Object#finalize()
      */
     protected void finalize() throws Throwable {

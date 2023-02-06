@@ -12,9 +12,9 @@ import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.springframework.batch.retry.RetryCallback;
-import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.RetryListener;
+import org.springframework.retry.RetryCallback;
+import org.springframework.retry.RetryContext;
+import org.springframework.retry.RetryListener;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -42,7 +42,7 @@ public class SolrServerRollbackListener implements RetryListener {
     private boolean allowCompression = true;
     int numberOfRetries = 5;
 
-    public <T> boolean open(RetryContext context, RetryCallback<T> callback) {
+    public <T, E extends Throwable> boolean open(RetryContext context, RetryCallback<T, E> callback) {
         if (solrUrl != null && solrServer == null) {
             try {
                 createSolrServer();
@@ -60,11 +60,11 @@ public class SolrServerRollbackListener implements RetryListener {
         return solrServer != null;
     }
 
-    public <T> void close(RetryContext context, RetryCallback<T> callback, Throwable throwable) {
+    public <T, E extends Throwable> void close(RetryContext context, RetryCallback<T, E> callback, Throwable throwable) {
         // do noting
     }
 
-    public <T> void onError(RetryContext context, RetryCallback<T> callback, Throwable throwable) {
+    public <T, E extends Throwable> void onError(RetryContext context, RetryCallback<T, E> callback, Throwable throwable) {
 
         if (solrServer != null){
             try {
