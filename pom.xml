@@ -19,9 +19,10 @@
     <properties>
         <solr.url>http://127.0.0.1:8983/solr</solr.url>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <calimocho.version>2.6.0</calimocho.version>
+        <calimocho.version>2.6.1-SNAPSHOT</calimocho.version>
         <psimi.version>1.10.0-SNAPSHOT</psimi.version>
         <spring.version>4.3.30.RELEASE</spring.version>
+        <spring.batch.version>3.0.10.RELEASE</spring.batch.version>
     </properties>
 
     <build>
@@ -203,38 +204,16 @@
             <groupId>psidev.psi.mi</groupId>
             <artifactId>psimitab</artifactId>
             <version>${psimi.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>com.springsource.org.apache.commons.io</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>psidev.psi.mi</groupId>
             <artifactId>psi25-xml</artifactId>
             <version>${psimi.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>com.springsource.org.apache.commons.io</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>woodstox</groupId>
-                    <artifactId>wstx-asl</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>psidev.psi.mi</groupId>
             <artifactId>psi25-xml-rdf</artifactId>
             <version>${psimi.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>woodstox</groupId>
-                    <artifactId>wstx-asl</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>psidev.psi.mi</groupId>
@@ -255,20 +234,14 @@
 
         <!-- Jetty -->
         <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jetty</artifactId>
-            <version>6.1.26</version>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>7.2.0.RC0</version>
         </dependency>
         <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jetty-util</artifactId>
-            <version>6.1.26</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jsp-2.1</artifactId>
-            <version>6.1.14</version>
-            <optional>true</optional>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-webapp</artifactId>
+            <version>7.2.0.RC0</version>
         </dependency>
 
         <!-- Apache Solr -->
@@ -285,12 +258,6 @@
             <version>3.6.2</version>
             <type>jar</type>
             <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.codehaus.woodstox</groupId>
-                    <artifactId>org.codehaus.woodstox</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- Logging -->
@@ -310,19 +277,16 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>1.4.197</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
+            <version>${spring.version}</version>
         </dependency>
 
         <!-- Commons -->
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.4</version>
-        </dependency>
         <dependency>
             <groupId>commons-dbcp</groupId>
             <artifactId>commons-dbcp</artifactId>
@@ -332,6 +296,7 @@
         <dependency>
             <groupId>org.springframework.batch</groupId>
             <artifactId>spring-batch-core</artifactId>
+            <version>${spring.batch.version}</version>
         </dependency>
 
         <dependency>
@@ -344,13 +309,7 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
             <version>${spring.version}</version>
-            <optional>true</optional>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
+            <scope>test</scope>
         </dependency>
 
         <!-- json parser -->
@@ -358,24 +317,13 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20090211</version>
+            <version>20220320</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.3.4</version>
-            <!-- HttpSolrServer requires this dependency. -->
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.codehaus.woodstox</groupId>
-                    <artifactId>wstx-asl</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>4.3.6</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -384,18 +332,6 @@
             <!-- HttpSolrServer requires this dependency. -->
         </dependency>
 
-        <!-- xerces -->
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <version>2.9.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-            <version>1.3.2</version>
-        </dependency>
     </dependencies>
 
     <repositories>
