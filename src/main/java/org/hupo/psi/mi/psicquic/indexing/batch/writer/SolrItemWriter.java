@@ -50,8 +50,8 @@ public class SolrItemWriter implements ItemWriter<Row>, ItemStream {
 
     /**
      * Index a list of calimocho rows in SOLR
-     * @param items
-     * @throws Exception
+     * @param items: items to write
+     * @throws Exception if anything
      */
     public void write(List<? extends Row> items) throws Exception {
         needToCommitOnClose = false;

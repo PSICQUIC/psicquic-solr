@@ -6,6 +6,7 @@ import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.scope.context.ChunkContext;
 
 /**
  * Listener of a job step that will print the number of lines that have been read
@@ -34,10 +35,10 @@ public class SimpleChunkListener implements StepExecutionListener, ChunkListener
         this.startTime = System.currentTimeMillis();
     }
 
-    public void beforeChunk() {
+    public void beforeChunk(ChunkContext chunkContext) {
     }
 
-    public void afterChunk() {
+    public void afterChunk(ChunkContext chunkContext) {
         if (!log.isInfoEnabled()) {
             return;
         }
@@ -45,5 +46,8 @@ public class SimpleChunkListener implements StepExecutionListener, ChunkListener
         final int readCount = stepExecution.getReadCount();
 
         log.info("Number of lines read : " + readCount);
+    }
+
+    public void afterChunkError(ChunkContext chunkContext) {
     }
 }

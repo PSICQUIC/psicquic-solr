@@ -216,7 +216,7 @@ public class PsicquicSearchResults {
 
     /**
      *
-     * @param facetFieldName
+     * @param facetFieldName: name of the facet field
      * @return the facet field with a specific name, null if it does not exist
      */
     public FacetField getFacetField(String facetFieldName){
