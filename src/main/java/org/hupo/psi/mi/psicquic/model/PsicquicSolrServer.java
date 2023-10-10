@@ -152,8 +152,9 @@ public class PsicquicSolrServer {
      * @param maxResults : max number of results
      * @param returnType : format of the results
      * @param queryFilter : any filter to add to the query
-     * @return  the response
-     * @throws PsicquicSolrException
+     * @return the response
+     * @throws PsicquicSolrException if the format is not a recognised MITAB format
+     * @throws SolrServerException if thrown by query call
      */
     public PsicquicSearchResults search(String q, Integer firstResult, Integer maxResults, String returnType, String queryFilter) throws PsicquicSolrException, SolrServerException {
 
@@ -231,9 +232,9 @@ public class PsicquicSolrServer {
      * @param facets : names of the facet fields to return with this query
      * @param firstFacet : first facet elements in the facet field lists (for pagination)
      * @param maxFacet : maxNumber of facet fields to return
-     * @return
-     * @throws PsicquicSolrException
-     * @throws SolrServerException
+     * @return the response
+     * @throws PsicquicSolrException if the format is not a recognised MITAB format
+     * @throws SolrServerException if thrown by query call
      */
     public PsicquicSearchResults searchWithFacets(String q, Integer firstResult, Integer maxResults, String returnType, String [] queryFilter, String [] facets, Integer firstFacet, Integer maxFacet) throws PsicquicSolrException, SolrServerException {
         if (q == null) throw new NullPointerException("Null query");
@@ -422,11 +423,11 @@ public class PsicquicSolrServer {
 
     /**
      *
-     * @param docList
+     * @param docList : the list of solr documents returned by the query response
      * @param returnType : build the results based on return type. If it is not provided, MITAB 2.5 is the default return type
      * @param facetFields : list of facet fields returned by query response
      * @return PsicquicSearchResults built on MITAB
-     * @throws PsicquicSolrException
+     * @throws PsicquicSolrException if the format is not a recognised MITAB format
      */
     protected PsicquicSearchResults createSearchResults(SolrDocumentList docList, String returnType, List<FacetField> facetFields) throws PsicquicSolrException {
 
@@ -442,7 +443,7 @@ public class PsicquicSolrServer {
      * @param mitabType : build the results based on mitab type
      * @param facetFields : list of facet fields returned by query response
      * @return PsicquicSearchResults built on MITAB
-     * @throws PsicquicSolrException
+     * @throws PsicquicSolrException if the format is not a recognised MITAB format
      */
     protected PsicquicSearchResults createMitabResultsForType(SolrDocumentList docList, String mitabType, List<FacetField> facetFields) throws PsicquicSolrException {
 

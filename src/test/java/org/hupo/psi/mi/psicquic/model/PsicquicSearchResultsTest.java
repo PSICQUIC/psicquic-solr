@@ -107,8 +107,7 @@ public class PsicquicSearchResultsTest  extends AbstractSolrServerTest {
     }
 
 
-    @Test //TODO: update the converter (psi25-xml-rdf) to use the latest Paxtools (normalizer module) instead of way too old biopax-validator 2.0.0 (its miriam-lib).
-    //This test passes now - as BioPAX team (Igor) quickly released org.biopax:miriam-lib:3.0.4 (see pom.xml) per our request.
+    @Test
     public void test_create_rdf_results() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException, SolrServerException, PsicquicSolrException, PsimiTabException, IOException, XmlConversionException, IllegalAccessException {
 
         solrMitabIndexer.startJob("mitabIndexNegativeJob");

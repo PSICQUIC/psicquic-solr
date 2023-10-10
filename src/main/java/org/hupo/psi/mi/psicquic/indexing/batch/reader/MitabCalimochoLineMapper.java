@@ -30,10 +30,10 @@ public class MitabCalimochoLineMapper implements LineMapper<Row>{
 
     /**
      * Convert a MITAB line in a calimocho row
-     * @param line : mitab line
-     * @param lineNumber
+     * @param line: mitab line
+     * @param lineNumber: line number
      * @return the matching Calimocho Row
-     * @throws Exception
+     * @throws Exception if anything
      */
     public Row mapLine(String line, int lineNumber) throws Exception {
         try {
