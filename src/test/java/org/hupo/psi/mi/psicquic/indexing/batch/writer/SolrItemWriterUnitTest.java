@@ -1,14 +1,20 @@
 package org.hupo.psi.mi.psicquic.indexing.batch.writer;
 
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.hupo.psi.calimocho.model.Row;
-import org.hupo.psi.mi.psicquic.indexing.batch.AbstractSolrServerTest;
 import org.hupo.psi.mi.psicquic.indexing.batch.reader.MitabCalimochoLineMapper;
+import org.hupo.psi.mi.psicquic.indexing.batch.repository.InteractionRepository;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Arrays;
+import java.util.List;
 
 /**
  * Unit tester for SolrItemWriter
@@ -17,14 +23,27 @@ import java.util.Arrays;
  * @version $Id$
  * @since <pre>16/07/12</pre>
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration( locations = {
+        "classpath*:/META-INF/psicquic-spring.xml",
+        "classpath*:/jobs/psicquic-indexing-spring-test.xml"
+})
+public class SolrItemWriterUnitTest {
 
-public class SolrItemWriterUnitTest extends AbstractSolrServerTest {
+    @Autowired
+    private InteractionRepository interactionRepository;
+    @Autowired
+    private SolrClient solrClient;
+
+    @Before
+    public void clearRepo() {
+        interactionRepository.deleteAll();
+    }
 
     @Test
     public void test_write_mitab27_row() throws Exception {
-        String solrURL= "http://127.0.0.1:18080/solr";
         SolrItemWriter writer = new SolrItemWriter();
-        writer.setSolrUrl(solrURL);
+        writer.setInteractionRepository(interactionRepository);
 
         // add some data to the solrServer using writer
         MitabCalimochoLineMapper mitabLineMapper = new MitabCalimochoLineMapper();
@@ -35,18 +54,17 @@ public class SolrItemWriterUnitTest extends AbstractSolrServerTest {
         // index data to be hosted by PSICQUIC : we should have one result
         ExecutionContext context = new ExecutionContext();
         writer.open(context);
-        writer.write(Arrays.asList(row));
+        writer.write(List.of(row));
         writer.update(context);
         writer.close();
 
-        Assert.assertEquals(1L, solrJettyRunner.getSolrServer().query(new SolrQuery("*:*")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrClient.query(new SolrQuery("*:*")).getResults().getNumFound());
     }
 
     @Test
     public void test_write_diff_mitab_version_rows() throws Exception {
-        String solrURL= "http://127.0.0.1:18080/solr";
         SolrItemWriter writer = new SolrItemWriter();
-        writer.setSolrUrl(solrURL);
+        writer.setInteractionRepository(interactionRepository);
 
         // add some data to the solrServer using writer
         MitabCalimochoLineMapper mitabLineMapper = new MitabCalimochoLineMapper();
@@ -59,11 +77,11 @@ public class SolrItemWriterUnitTest extends AbstractSolrServerTest {
         // index data to be hosted by PSICQUIC : we should have 2 results
         ExecutionContext context = new ExecutionContext();
         writer.open(context);
-        writer.write(Arrays.asList(firstRow));
-        writer.write(Arrays.asList(secondRow));
+        writer.write(List.of(firstRow));
+        writer.write(List.of(secondRow));
         writer.update(context);
         writer.close();
 
-        Assert.assertEquals(2L, solrJettyRunner.getSolrServer().query(new SolrQuery("*:*")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrClient.query(new SolrQuery("*:*")).getResults().getNumFound());
     }
 }

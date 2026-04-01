@@ -1,11 +1,10 @@
 package org.hupo.psi.mi.psicquic.model;
 
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocumentList;
 import org.hupo.psi.calimocho.io.IllegalRowException;
-import org.hupo.psi.mi.psicquic.indexing.batch.AbstractSolrServerTest;
 import org.hupo.psi.mi.psicquic.indexing.batch.SolrMitabIndexer;
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,8 +23,6 @@ import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.xml.model.Entry;
 import psidev.psi.mi.xml.model.EntrySet;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
@@ -38,21 +35,23 @@ import java.util.Collection;
  * @since <pre>30/07/12</pre>
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration( locations = {"classpath*:/META-INF/psicquic-spring.xml",
-        "classpath*:/jobs/psicquic-indexing-spring-test.xml"})
-public class PsicquicSearchResultsTest  extends AbstractSolrServerTest {
+@ContextConfiguration( locations = {
+        "classpath*:/META-INF/psicquic-spring.xml",
+        "classpath*:/jobs/psicquic-indexing-spring-test.xml"
+})
+public class PsicquicSearchResultsTest {
 
     @Autowired
     private SolrMitabIndexer solrMitabIndexer;
+    @Autowired
+    private SolrClient solrClient;
 
     @Test
-    public void test_create_mitab_results() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException, SolrServerException, PsicquicSolrException, PsimiTabException, IOException {
+    public void test_create_mitab_results() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException, SolrServerException, PsimiTabException, IOException {
 
         solrMitabIndexer.startJob("mitabIndexNegativeJob");
 
-        SolrServer server = solrJettyRunner.getSolrServer();
-
-        SolrDocumentList solrResults = server.query(new SolrQuery("*:*")).getResults();
+        SolrDocumentList solrResults = solrClient.query(new SolrQuery("*:*")).getResults();
         PsicquicSearchResults psicquicSearchResults = new PsicquicSearchResults(solrResults, PsicquicSolrServer.DATA_FIELDS_27);
 
         InputStream mitabInputStream = psicquicSearchResults.getMitab();
@@ -72,13 +71,11 @@ public class PsicquicSearchResultsTest  extends AbstractSolrServerTest {
     }
 
     @Test
-    public void test_create_xml_results() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException, SolrServerException, PsicquicSolrException, PsimiTabException, IOException, XmlConversionException, IllegalAccessException {
+    public void test_create_xml_results() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException, SolrServerException, PsimiTabException, IOException, XmlConversionException, IllegalAccessException {
 
         solrMitabIndexer.startJob("mitabIndexNegativeJob");
 
-        SolrServer server = solrJettyRunner.getSolrServer();
-
-        SolrDocumentList solrResults = server.query(new SolrQuery("*:*")).getResults();
+        SolrDocumentList solrResults = solrClient.query(new SolrQuery("*:*")).getResults();
         PsicquicSearchResults psicquicSearchResults = new PsicquicSearchResults(solrResults, PsicquicSolrServer.DATA_FIELDS_27);
 
         EntrySet xml = psicquicSearchResults.createEntrySet();
@@ -91,13 +88,11 @@ public class PsicquicSearchResultsTest  extends AbstractSolrServerTest {
     }
 
     @Test
-    public void test_create_xgmml_results() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException, SolrServerException, PsicquicSolrException, PsimiTabException, IOException, XmlConversionException, IllegalAccessException, IllegalRowException, XMLStreamException, JAXBException {
+    public void test_create_xgmml_results() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException, SolrServerException, IOException, IllegalRowException {
 
         solrMitabIndexer.startJob("mitabIndexNegativeJob");
 
-        SolrServer server = solrJettyRunner.getSolrServer();
-
-        SolrDocumentList solrResults = server.query(new SolrQuery("*:*")).getResults();
+        SolrDocumentList solrResults = solrClient.query(new SolrQuery("*:*")).getResults();
         PsicquicSearchResults psicquicSearchResults = new PsicquicSearchResults(solrResults, PsicquicSolrServer.DATA_FIELDS_27);
 
         InputStream xgmml = psicquicSearchResults.createXGMML();
@@ -108,13 +103,11 @@ public class PsicquicSearchResultsTest  extends AbstractSolrServerTest {
 
 
     @Test
-    public void test_create_rdf_results() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException, SolrServerException, PsicquicSolrException, PsimiTabException, IOException, XmlConversionException, IllegalAccessException {
+    public void test_create_rdf_results() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException, SolrServerException, PsimiTabException, IOException, XmlConversionException, IllegalAccessException {
 
         solrMitabIndexer.startJob("mitabIndexNegativeJob");
 
-        SolrServer server = solrJettyRunner.getSolrServer();
-
-        SolrDocumentList solrResults = server.query(new SolrQuery("*:*")).getResults();
+        SolrDocumentList solrResults = solrClient.query(new SolrQuery("*:*")).getResults();
         PsicquicSearchResults psicquicSearchResults = new PsicquicSearchResults(solrResults, PsicquicSolrServer.DATA_FIELDS_27);
 
         InputStream invalidFormat = psicquicSearchResults.createRDFOrBiopax("rdf");

@@ -1,10 +1,9 @@
 package org.hupo.psi.mi.psicquic.model;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.FacetParams;
@@ -13,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import psidev.psi.mi.calimocho.solr.converter.SolrFieldName;
 import psidev.psi.mi.tab.PsimiTabReader;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,7 @@ import java.util.Map;
  * @since <pre>12/06/12</pre>
  */
 
-public class PsicquicSolrServer {
+public class PsicquicSolrServer implements Closeable {
 
     private final Logger logger = LoggerFactory.getLogger(PsicquicSolrServer.class);
 
@@ -47,7 +48,7 @@ public class PsicquicSolrServer {
     /**
      * solr server
      */
-    protected SolrServer solrServer;
+    protected SolrClient solrClient;
     /**
      * MITAB reader
      */
@@ -118,11 +119,11 @@ public class PsicquicSolrServer {
             SolrFieldName.causalmechanism+STORED_FIELD_EXTENSION, SolrFieldName.causalstatement+STORED_FIELD_EXTENSION
     };
 
-    public PsicquicSolrServer(SolrServer solrServer){
-        this.solrServer = solrServer;
+    public PsicquicSolrServer(SolrClient solrClient) {
+        this.solrClient = solrClient;
 
-        if (this.solrServer == null){
-            throw new IllegalArgumentException("Cannot create a new PsicquicSolrServer if the SolrServer is null");
+        if (this.solrClient == null){
+            throw new IllegalArgumentException("Cannot create a new PsicquicSolrServer if the SolrClient is null");
         }
 
         // initialise default solr field map
@@ -392,13 +393,17 @@ public class PsicquicSolrServer {
             copy.addFilterQuery(SolrFieldName.negative+":false");
         }
 
-        org.apache.solr.client.solrj.response.QueryResponse solrResponse = solrServer.query(copy);
+        try {
+            org.apache.solr.client.solrj.response.QueryResponse solrResponse = solrClient.query(copy);
 
-        if (solrResponse == null){
-            return null;
+            if (solrResponse == null){
+                return null;
+            }
+
+            return createSearchResults(solrResponse.getResults(), returnType, solrResponse.getFacetFields());
+        } catch (IOException e) {
+            throw new PsicquicSolrException(e);
         }
-
-        return createSearchResults(solrResponse.getResults(), returnType, solrResponse.getFacetFields());
     }
 
     private boolean containsNegativeFilter(SolrQuery query){
@@ -460,11 +465,9 @@ public class PsicquicSolrServer {
     /**
      * Shutdown solr servers
      */
-    public void shutdown(){
-
-        if (this.solrServer != null && this.solrServer instanceof HttpSolrServer){
-            HttpSolrServer httpsolrServer = (HttpSolrServer) solrServer;
-            httpsolrServer.shutdown();
+    public void close() throws IOException {
+        if (this.solrClient != null){
+            solrClient.close();
         }
     }
 }

@@ -5,7 +5,7 @@
     <artifactId>psicquic-solr</artifactId>
     <packaging>jar</packaging>
 
-    <version>1.5.2</version>
+    <version>1.6.0-SNAPSHOT</version>
 
     <name>PSI :: PSICQUIC Solr</name>
 
@@ -19,8 +19,10 @@
     <properties>
         <solr.url>http://127.0.0.1:8983/solr</solr.url>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <calimocho.version>2.6.3</calimocho.version>
-        <psimi.version>1.10.2</psimi.version>
+        <calimocho.version>2.7.0-SNAPSHOT</calimocho.version>
+        <psimi.version>1.11.0-SNAPSHOT</psimi.version>
+<!--        <calimocho.version>2.6.3</calimocho.version>-->
+<!--        <psimi.version>1.10.2</psimi.version>-->
         <spring.version>4.3.30.RELEASE</spring.version>
         <spring.batch.version>3.0.10.RELEASE</spring.batch.version>
     </properties>
@@ -224,6 +226,10 @@
                     <groupId>woodstox</groupId>
                     <artifactId>wstx-asl</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>net.sf.saxon</groupId>
+                    <artifactId>saxon-xom</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -254,44 +260,16 @@
             <version>${calimocho.version}</version>
         </dependency>
 
-        <!-- Jetty -->
-        <dependency>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>jetty</artifactId>
-        <version>6.1.26</version>
-    </dependency>
-        <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jetty-util</artifactId>
-            <version>6.1.26</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jsp-2.1</artifactId>
-            <version>6.1.14</version>
-            <optional>true</optional>
-        </dependency>
-
         <!-- Apache Solr -->
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-core</artifactId>
-            <version>3.6.2</version>
-            <type>jar</type>
-            <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.codehaus.woodstox</groupId>
-                    <artifactId>org.codehaus.woodstox</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>5.5.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-solrj</artifactId>
-            <version>3.6.2</version>
-            <type>jar</type>
-            <scope>compile</scope>
+            <version>5.5.0</version>
         </dependency>
 
         <!-- Logging -->
@@ -318,6 +296,12 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
             <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-solr</artifactId>
+            <version>2.1.23.RELEASE</version>
         </dependency>
 
         <!-- Commons -->
@@ -365,29 +349,6 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20220320</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.3.6</version>
-            <!-- HttpSolrServer requires this dependency. -->
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.codehaus.woodstox</groupId>
-                    <artifactId>wstx-asl</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpmime</artifactId>
-            <version>4.3.4</version>
-            <!-- HttpSolrServer requires this dependency. -->
         </dependency>
 
         <!-- xerces -->

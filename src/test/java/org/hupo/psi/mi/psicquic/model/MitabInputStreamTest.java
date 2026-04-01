@@ -1,10 +1,9 @@
 package org.hupo.psi.mi.psicquic.model;
 
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocumentList;
-import org.hupo.psi.mi.psicquic.indexing.batch.AbstractSolrServerTest;
 import org.hupo.psi.mi.psicquic.indexing.batch.SolrMitabIndexer;
 import org.junit.Assert;
 import org.junit.Test;
@@ -32,22 +31,25 @@ import java.util.Collection;
  * @since <pre>30/07/12</pre>
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration( locations = {"classpath*:/META-INF/psicquic-spring.xml",
-        "classpath*:/jobs/psicquic-indexing-spring-test.xml"})
-public class MitabInputStreamTest  extends AbstractSolrServerTest {
+@ContextConfiguration( locations = {
+        "classpath*:/META-INF/psicquic-spring.xml",
+        "classpath*:/jobs/psicquic-indexing-spring-test.xml"
+})
+public class MitabInputStreamTest {
 
     @Autowired
     private SolrMitabIndexer solrMitabIndexer;
-    private PsimiTabReader mitabReader = new PsimiTabReader();
+    @Autowired
+    private SolrClient solrClient;
+
+    private final PsimiTabReader mitabReader = new PsimiTabReader();
 
     @Test
-    public void test_create_mitab25_results() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException, SolrServerException, PsicquicSolrException, PsimiTabException, IOException {
+    public void test_create_mitab25_results() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException, SolrServerException, PsimiTabException, IOException {
 
         solrMitabIndexer.startJob("mitabIndexNegativeJob");
 
-        SolrServer server = solrJettyRunner.getSolrServer();
-
-        SolrDocumentList solrResults = server.query(new SolrQuery("*:*")).getResults();
+        SolrDocumentList solrResults = solrClient.query(new SolrQuery("*:*")).getResults();
         MitabInputStream mitabInput = new MitabInputStream(solrResults, PsicquicSolrServer.DATA_FIELDS_25);
 
         Collection<BinaryInteraction> binaryInteractions = mitabReader.read(mitabInput);
@@ -84,13 +86,11 @@ public class MitabInputStreamTest  extends AbstractSolrServerTest {
     }
 
     @Test
-    public void test_create_mitab26_results() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException, SolrServerException, PsicquicSolrException, PsimiTabException, IOException {
+    public void test_create_mitab26_results() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException, SolrServerException, PsimiTabException, IOException {
 
         solrMitabIndexer.startJob("mitabIndexNegativeJob");
 
-        SolrServer server = solrJettyRunner.getSolrServer();
-
-        SolrDocumentList solrResults = server.query(new SolrQuery("*:*")).getResults();
+        SolrDocumentList solrResults = solrClient.query(new SolrQuery("*:*")).getResults();
         MitabInputStream mitabInput = new MitabInputStream(solrResults, PsicquicSolrServer.DATA_FIELDS_26);
 
         Collection<BinaryInteraction> binaryInteractions = mitabReader.read(mitabInput);
@@ -130,13 +130,11 @@ public class MitabInputStreamTest  extends AbstractSolrServerTest {
     }
 
     @Test
-    public void test_create_mitab27_results() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException, SolrServerException, PsicquicSolrException, PsimiTabException, IOException {
+    public void test_create_mitab27_results() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException, SolrServerException, PsimiTabException, IOException {
 
         solrMitabIndexer.startJob("mitabIndexNegativeJob");
 
-        SolrServer server = solrJettyRunner.getSolrServer();
-
-        SolrDocumentList solrResults = server.query(new SolrQuery("*:*")).getResults();
+        SolrDocumentList solrResults = solrClient.query(new SolrQuery("*:*")).getResults();
         MitabInputStream mitabInput = new MitabInputStream(solrResults, PsicquicSolrServer.DATA_FIELDS_27);
 
         Collection<BinaryInteraction> binaryInteractions = mitabReader.read(mitabInput);
@@ -167,13 +165,11 @@ public class MitabInputStreamTest  extends AbstractSolrServerTest {
     }
 
     @Test
-    public void test_create_mitab28_results() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException, SolrServerException, PsicquicSolrException, PsimiTabException, IOException {
+    public void test_create_mitab28_results() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException, SolrServerException, PsimiTabException, IOException {
 
         solrMitabIndexer.startJob("mitabIndexMitab28Job");
 
-        SolrServer server = solrJettyRunner.getSolrServer();
-
-        SolrDocumentList solrResults = server.query(new SolrQuery("idA:P05556")).getResults();
+        SolrDocumentList solrResults = solrClient.query(new SolrQuery("idA:P05556")).getResults();
         MitabInputStream mitabInput = new MitabInputStream(solrResults, PsicquicSolrServer.DATA_FIELDS_28);
 
         Collection<BinaryInteraction> binaryInteractions = mitabReader.read(mitabInput);

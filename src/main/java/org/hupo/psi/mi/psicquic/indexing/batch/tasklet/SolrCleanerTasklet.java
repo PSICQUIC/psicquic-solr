@@ -1,6 +1,6 @@
 package org.hupo.psi.mi.psicquic.indexing.batch.tasklet;
 
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.hupo.psi.mi.psicquic.indexing.batch.repository.InteractionRepository;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -16,32 +16,23 @@ import org.springframework.batch.repeat.RepeatStatus;
 
 public class SolrCleanerTasklet implements Tasklet {
 
-    private String solrUrl;
+    private InteractionRepository interactionRepository;
 
     public SolrCleanerTasklet() {
     }
 
-    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        if (solrUrl != null){
-
-            // delete all previous records
-            HttpSolrServer solrServer = new HttpSolrServer(solrUrl);
-            solrServer.deleteByQuery("*:*");
-
-            // optimize here
-            solrServer.optimize();
-
-            contribution.getExitStatus().addExitDescription("Cleared: " + solrUrl);
-            solrServer.shutdown();
-        }
-        else {
-            throw new IllegalStateException("no SOLR server url found.");
-        }
-
+    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
+        // delete all previous records
+        interactionRepository.deleteAll();
+        contribution.getExitStatus().addExitDescription("Cleared.");
         return RepeatStatus.FINISHED;
     }
 
-    public void setSolrUrl(String solrUrl) {
-        this.solrUrl = solrUrl;
+    public InteractionRepository getInteractionRepository() {
+        return interactionRepository;
+    }
+
+    public void setInteractionRepository(InteractionRepository interactionRepository) {
+        this.interactionRepository = interactionRepository;
     }
 }
