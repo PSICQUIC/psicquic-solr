@@ -1,10 +1,10 @@
 package org.hupo.psi.mi.psicquic.indexing.batch.tasklet;
 
-import org.hupo.psi.mi.psicquic.indexing.batch.repository.InteractionRepository;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.data.solr.repository.SolrCrudRepository;
 
 /**
  * clean solr
@@ -14,25 +14,25 @@ import org.springframework.batch.repeat.RepeatStatus;
  * @since <pre>30/05/12</pre>
  */
 
-public class SolrCleanerTasklet implements Tasklet {
+public class SolrCleanerTasklet<T> implements Tasklet {
 
-    private InteractionRepository interactionRepository;
+    private SolrCrudRepository<T, String> solrCrudRepository;
 
     public SolrCleanerTasklet() {
     }
 
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
         // delete all previous records
-        interactionRepository.deleteAll();
+        solrCrudRepository.deleteAll();
         contribution.getExitStatus().addExitDescription("Cleared.");
         return RepeatStatus.FINISHED;
     }
 
-    public InteractionRepository getInteractionRepository() {
-        return interactionRepository;
+    public SolrCrudRepository<T, String> getSolrCrudRepository() {
+        return solrCrudRepository;
     }
 
-    public void setInteractionRepository(InteractionRepository interactionRepository) {
-        this.interactionRepository = interactionRepository;
+    public void setSolrCrudRepository(SolrCrudRepository<T, String> solrCrudRepository) {
+        this.solrCrudRepository = solrCrudRepository;
     }
 }

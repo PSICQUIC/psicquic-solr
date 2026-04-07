@@ -2,13 +2,12 @@ package org.hupo.psi.mi.psicquic.indexing.batch.writer;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.hupo.psi.calimocho.model.Row;
-import org.hupo.psi.mi.psicquic.indexing.batch.model.SolrInteraction;
-import org.hupo.psi.mi.psicquic.indexing.batch.repository.InteractionRepository;
+import org.hupo.psi.mi.psicquic.indexing.batch.converter.SolrInputDocumentConverter;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
-import psidev.psi.mi.calimocho.solr.converter.Converter;
+import org.springframework.data.solr.repository.SolrCrudRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,14 +20,10 @@ import java.util.List;
  * @since <pre>29/05/12</pre>
  */
 
-public class SolrItemWriter implements ItemWriter<Row>, ItemStream {
+public class SolrItemWriter<T extends SolrInputDocument> implements ItemWriter<Row>, ItemStream {
 
-    private InteractionRepository interactionRepository;
-    protected Converter solrConverter;
-
-    public SolrItemWriter(){
-        solrConverter = new Converter();
-    }
+    private SolrCrudRepository<T, String> solrCrudRepository;
+    protected SolrInputDocumentConverter<T> solrConverter;
 
     /**
      * Index a list of calimocho rows in SOLR
@@ -40,11 +35,11 @@ public class SolrItemWriter implements ItemWriter<Row>, ItemStream {
             return;
         }
 
-        List<SolrInteraction> solrInputDocuments = new ArrayList<>();
+        List<T> solrInputDocuments = new ArrayList<>();
         for (Row row : items) {
-            solrInputDocuments.add(new SolrInteraction(solrConverter.toSolrDocument(row)));
+            solrInputDocuments.add(solrConverter.toSolrDocument(row));
         }
-        interactionRepository.save(solrInputDocuments);
+        solrCrudRepository.save(solrInputDocuments);
     }
 
     public void open(ExecutionContext executionContext) throws ItemStreamException {
@@ -56,11 +51,19 @@ public class SolrItemWriter implements ItemWriter<Row>, ItemStream {
     public void close() throws ItemStreamException {
     }
 
-    public InteractionRepository getInteractionRepository() {
-        return interactionRepository;
+    public SolrCrudRepository<T, String> getSolrCrudRepository() {
+        return solrCrudRepository;
     }
 
-    public void setInteractionRepository(InteractionRepository interactionRepository) {
-        this.interactionRepository = interactionRepository;
+    public void setSolrCrudRepository(SolrCrudRepository<T, String> solrCrudRepository) {
+        this.solrCrudRepository = solrCrudRepository;
+    }
+
+    public SolrInputDocumentConverter<T> getSolrConverter() {
+        return solrConverter;
+    }
+
+    public void setSolrConverter(SolrInputDocumentConverter<T> solrConverter) {
+        this.solrConverter = solrConverter;
     }
 }

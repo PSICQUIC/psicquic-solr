@@ -3,6 +3,8 @@ package org.hupo.psi.mi.psicquic.indexing.batch.writer;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.hupo.psi.calimocho.model.Row;
+import org.hupo.psi.mi.psicquic.indexing.batch.converter.SolrInteractionConverter;
+import org.hupo.psi.mi.psicquic.indexing.batch.model.SolrInteraction;
 import org.hupo.psi.mi.psicquic.indexing.batch.reader.MitabCalimochoLineMapper;
 import org.hupo.psi.mi.psicquic.indexing.batch.repository.InteractionRepository;
 import org.junit.Assert;
@@ -33,6 +35,8 @@ public class SolrItemWriterUnitTest {
     @Autowired
     private InteractionRepository interactionRepository;
     @Autowired
+    private SolrInteractionConverter solrInteractionConverter;
+    @Autowired
     private SolrClient solrClient;
 
     @Before
@@ -42,8 +46,9 @@ public class SolrItemWriterUnitTest {
 
     @Test
     public void test_write_mitab27_row() throws Exception {
-        SolrItemWriter writer = new SolrItemWriter();
-        writer.setInteractionRepository(interactionRepository);
+        SolrItemWriter<SolrInteraction> writer = new SolrItemWriter<>();
+        writer.setSolrCrudRepository(interactionRepository);
+        writer.setSolrConverter(solrInteractionConverter);
 
         // add some data to the solrServer using writer
         MitabCalimochoLineMapper mitabLineMapper = new MitabCalimochoLineMapper();
@@ -63,8 +68,9 @@ public class SolrItemWriterUnitTest {
 
     @Test
     public void test_write_diff_mitab_version_rows() throws Exception {
-        SolrItemWriter writer = new SolrItemWriter();
-        writer.setInteractionRepository(interactionRepository);
+        SolrItemWriter<SolrInteraction> writer = new SolrItemWriter<>();
+        writer.setSolrCrudRepository(interactionRepository);
+        writer.setSolrConverter(solrInteractionConverter);
 
         // add some data to the solrServer using writer
         MitabCalimochoLineMapper mitabLineMapper = new MitabCalimochoLineMapper();

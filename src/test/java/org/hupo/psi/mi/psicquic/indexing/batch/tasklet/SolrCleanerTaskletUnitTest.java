@@ -2,7 +2,6 @@ package org.hupo.psi.mi.psicquic.indexing.batch.tasklet;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.common.SolrInputDocument;
 import org.hupo.psi.calimocho.model.Row;
 import org.hupo.psi.mi.psicquic.indexing.batch.model.SolrInteraction;
 import org.hupo.psi.mi.psicquic.indexing.batch.reader.MitabCalimochoLineMapper;
@@ -49,8 +48,8 @@ public class SolrCleanerTaskletUnitTest {
     @Test
     public void test_delete_all() throws Exception {
 
-        SolrCleanerTasklet tasklet = new SolrCleanerTasklet();
-        tasklet.setInteractionRepository(interactionRepository);
+        SolrCleanerTasklet<SolrInteraction> tasklet = new SolrCleanerTasklet<>();
+        tasklet.setSolrCrudRepository(interactionRepository);
 
         // add some data to the solrServer
         Converter solrConverter = new Converter();

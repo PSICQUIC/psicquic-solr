@@ -2,15 +2,10 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:batch="http://www.springframework.org/schema/batch"
-       xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
            http://www.springframework.org/schema/batch
-           http://www.springframework.org/schema/batch/spring-batch-3.0.xsd
-           http://www.springframework.org/schema/context
-           http://www.springframework.org/schema/context/spring-context-3.2.xsd">
-
-    <context:component-scan base-package="org.hupo.psi.mi.psicquic" />
+           http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 
     <bean id="firstTimeFailListener" class="org.hupo.psi.mi.psicquic.indexing.batch.FirstTimeFailListener"/>
 
@@ -48,18 +43,45 @@
         <property name="resource" ref="mitab28FileTest"/>
     </bean>
 
+    <!-- solr -->
+
+    <bean id="embeddedSolrServerFactory" class="org.springframework.data.solr.server.support.EmbeddedSolrServerFactory">
+        <constructor-arg value="src/test/resources/solr-home"/>
+    </bean>
+
+    <bean id="solrClient" factory-bean="embeddedSolrServerFactory" factory-method="getSolrClient">
+        <constructor-arg value="interactions"/>
+    </bean>
+
+    <bean id="solrRepositoryFactory" class="org.springframework.data.solr.repository.support.SolrRepositoryFactory">
+        <constructor-arg ref="solrClient"/>
+    </bean>
+
+    <bean id="interactionRepository" factory-bean="solrRepositoryFactory" factory-method="getRepository">
+        <constructor-arg value="org.hupo.psi.mi.psicquic.indexing.batch.repository.InteractionRepository"/>
+    </bean>
+
+    <bean id="isEmbeddedSolr" class="java.lang.Boolean">
+        <constructor-arg value="false"/>
+    </bean>
+
     <!-- writer -->
 
+    <bean id="solrInteractionConverter" class="org.hupo.psi.mi.psicquic.indexing.batch.converter.SolrInteractionConverter">
+    </bean>
+
     <bean id="solrWriterTest" class="org.hupo.psi.mi.psicquic.indexing.batch.writer.SolrItemWriter">
-        <property name="interactionRepository" ref="interactionRepository"/>
+        <property name="solrCrudRepository" ref="interactionRepository"/>
+        <property name="solrConverter" ref="solrInteractionConverter"/>
     </bean>
 
     <bean id="failingSolrWriterTest" class="org.hupo.psi.mi.psicquic.indexing.batch.writer.SolrItemWriterThrowingSolrServerException">
-        <property name="interactionRepository" ref="interactionRepository"/>
+        <property name="solrCrudRepository" ref="interactionRepository"/>
+        <property name="solrConverter" ref="solrInteractionConverter"/>
     </bean>
 
     <bean id="solrCleanerTaskletTest" class="org.hupo.psi.mi.psicquic.indexing.batch.tasklet.SolrCleanerTasklet">
-        <property name="interactionRepository" ref="interactionRepository"/>
+        <property name="solrCrudRepository" ref="interactionRepository"/>
     </bean>
 
     <!-- steps -->
