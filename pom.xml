@@ -21,8 +21,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <calimocho.version>2.7.0-SNAPSHOT</calimocho.version>
         <psimi.version>1.11.0-SNAPSHOT</psimi.version>
-<!--        <calimocho.version>2.6.3</calimocho.version>-->
-<!--        <psimi.version>1.10.2</psimi.version>-->
         <spring.version>4.3.30.RELEASE</spring.version>
         <spring.batch.version>3.0.10.RELEASE</spring.batch.version>
     </properties>
@@ -265,11 +263,29 @@
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-core</artifactId>
             <version>5.5.5</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-annotations</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-solrj</artifactId>
             <version>5.5.5</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-annotations</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-annotations</artifactId>
+            <version>2.10.2</version>
         </dependency>
 
         <!-- Logging -->
