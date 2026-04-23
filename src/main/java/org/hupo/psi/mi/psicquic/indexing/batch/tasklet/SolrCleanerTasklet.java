@@ -1,10 +1,12 @@
 package org.hupo.psi.mi.psicquic.indexing.batch.tasklet;
 
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.common.SolrInputDocument;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.data.solr.core.SolrOperations;
+import org.springframework.data.solr.core.query.SimpleQuery;
 
 /**
  * clean solr
@@ -14,25 +16,24 @@ import org.springframework.batch.repeat.RepeatStatus;
  * @since <pre>30/05/12</pre>
  */
 
-public class SolrCleanerTasklet implements Tasklet {
+public class SolrCleanerTasklet<T extends SolrInputDocument> implements Tasklet {
 
-    private String solrUrl;
+    private SolrOperations solrTemplate;
+    private String solrCollection;
 
     public SolrCleanerTasklet() {
     }
 
-    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        if (solrUrl != null){
+    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
+        if (solrTemplate != null){
 
             // delete all previous records
-            HttpSolrServer solrServer = new HttpSolrServer(solrUrl);
-            solrServer.deleteByQuery("*:*");
+            solrTemplate.delete(solrCollection, new SimpleQuery("*:*"));
 
             // optimize here
-            solrServer.optimize();
+            solrTemplate.commit(solrCollection);
 
-            contribution.getExitStatus().addExitDescription("Cleared: " + solrUrl);
-            solrServer.shutdown();
+            contribution.getExitStatus().addExitDescription("Cleared: " + solrCollection);
         }
         else {
             throw new IllegalStateException("no SOLR server url found.");
@@ -41,7 +42,11 @@ public class SolrCleanerTasklet implements Tasklet {
         return RepeatStatus.FINISHED;
     }
 
-    public void setSolrUrl(String solrUrl) {
-        this.solrUrl = solrUrl;
+    public void setSolrTemplate(SolrOperations solrTemplate) {
+        this.solrTemplate = solrTemplate;
+    }
+
+    public void setSolrCollection(String solrCollection) {
+        this.solrCollection = solrCollection;
     }
 }

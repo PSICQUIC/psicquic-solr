@@ -1,9 +1,8 @@
 package org.hupo.psi.mi.psicquic.model;
 
-import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.hupo.psi.mi.psicquic.indexing.batch.AbstractSolrServerTest;
 import org.hupo.psi.mi.psicquic.indexing.batch.SolrMitabIndexer;
+import org.hupo.psi.mi.psicquic.indexing.batch.model.SolrInteraction;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,6 +11,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.solr.core.SolrOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -28,21 +28,23 @@ import java.io.InputStreamReader;
  * @since <pre>30/07/12</pre>
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration( locations = {"classpath*:/META-INF/psicquic-spring.xml",
-        "classpath*:/jobs/psicquic-indexing-spring-test.xml"})
-public class PsicquicSolrServerTest extends AbstractSolrServerTest {
+@ContextConfiguration( locations = {
+        "classpath*:/META-INF/psicquic-spring.xml",
+        "classpath*:/jobs/psicquic-indexing-spring-test.xml"
+})
+public class PsicquicSolrServerTest {
 
     @Autowired
     private SolrMitabIndexer solrMitabIndexer;
+    @Autowired
+    private SolrOperations solrTemplate;
 
     @Test
     public void test_wild_query() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException, SolrServerException, PsicquicSolrException {
 
         solrMitabIndexer.startJob("mitabIndexNegativeJob");
 
-        SolrServer server = solrJettyRunner.getSolrServer();
-
-        PsicquicSolrServer psicquicServer = new PsicquicSolrServer(server);
+        PsicquicSolrServer psicquicServer = new PsicquicSolrServer(solrTemplate, SolrInteraction.INTERACTIONS_CORE_NAME);
 
         PsicquicSearchResults results = psicquicServer.search("*", null, null, PsicquicSolrServer.RETURN_TYPE_MITAB27, null);
 
@@ -55,9 +57,7 @@ public class PsicquicSolrServerTest extends AbstractSolrServerTest {
 
         solrMitabIndexer.startJob("mitabIndexMitab28Job");
 
-        SolrServer server = solrJettyRunner.getSolrServer();
-
-        PsicquicSolrServer psicquicServer = new PsicquicSolrServer(server);
+        PsicquicSolrServer psicquicServer = new PsicquicSolrServer(solrTemplate, SolrInteraction.INTERACTIONS_CORE_NAME);
 
         // default fields idA and idB
         PsicquicSearchResults results = psicquicServer.search("P07228", null, null, PsicquicSolrServer.RETURN_TYPE_MITAB27, null);
@@ -141,9 +141,7 @@ public class PsicquicSolrServerTest extends AbstractSolrServerTest {
 
         solrMitabIndexer.startJob("mitabIndexNegativeJob");
 
-        SolrServer server = solrJettyRunner.getSolrServer();
-
-        PsicquicSolrServer psicquicServer = new PsicquicSolrServer(server);
+        PsicquicSolrServer psicquicServer = new PsicquicSolrServer(solrTemplate, SolrInteraction.INTERACTIONS_CORE_NAME);
 
         // query start is 2. Only 2 results are expected
         PsicquicSearchResults results = psicquicServer.search("negative:(true OR false)", 2, null, PsicquicSolrServer.RETURN_TYPE_MITAB27, null);
@@ -175,9 +173,7 @@ public class PsicquicSolrServerTest extends AbstractSolrServerTest {
 
         solrMitabIndexer.startJob("mitabIndexNegativeJob");
 
-        SolrServer server = solrJettyRunner.getSolrServer();
-
-        PsicquicSolrServer psicquicServer = new PsicquicSolrServer(server);
+        PsicquicSolrServer psicquicServer = new PsicquicSolrServer(solrTemplate, SolrInteraction.INTERACTIONS_CORE_NAME);
 
         // identifier:P07228 is matching two results but with the query filter on participant detection method, only one result is expected
         PsicquicSearchResults results = psicquicServer.search("identifier:P07228 AND negative:(true OR false)", null, null, PsicquicSolrServer.RETURN_TYPE_MITAB27, "pmethod:\"predetermined participant\"");
@@ -209,9 +205,7 @@ public class PsicquicSolrServerTest extends AbstractSolrServerTest {
 
         solrMitabIndexer.startJob("mitabIndexMitab28Job");
 
-        SolrServer server = solrJettyRunner.getSolrServer();
-
-        PsicquicSolrServer psicquicServer = new PsicquicSolrServer(server);
+        PsicquicSolrServer psicquicServer = new PsicquicSolrServer(solrTemplate, SolrInteraction.INTERACTIONS_CORE_NAME);
 
         // default return type is mitab 25
         PsicquicSearchResults results = psicquicServer.search("*", null, null, PsicquicSolrServer.RETURN_TYPE_DEFAULT, null);
@@ -285,9 +279,7 @@ public class PsicquicSolrServerTest extends AbstractSolrServerTest {
 
         solrMitabIndexer.startJob("mitabIndexNegativeJob");
 
-        SolrServer server = solrJettyRunner.getSolrServer();
-
-        PsicquicSolrServer psicquicServer = new PsicquicSolrServer(server);
+        PsicquicSolrServer psicquicServer = new PsicquicSolrServer(solrTemplate, SolrInteraction.INTERACTIONS_CORE_NAME);
 
         // should return 4 lines because P0* can match both P07228 and P05556
         PsicquicSearchResults results = psicquicServer.search("P0* AND negative:(true OR false)", null, null, PsicquicSolrServer.RETURN_TYPE_MITAB27, null);

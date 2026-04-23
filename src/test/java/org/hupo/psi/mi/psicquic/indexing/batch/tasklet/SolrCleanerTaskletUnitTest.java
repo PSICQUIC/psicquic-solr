@@ -1,19 +1,24 @@
 package org.hupo.psi.mi.psicquic.indexing.batch.tasklet;
 
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.common.SolrInputDocument;
 import org.hupo.psi.calimocho.model.Row;
-import org.hupo.psi.mi.psicquic.indexing.batch.AbstractSolrServerTest;
+import org.hupo.psi.mi.psicquic.indexing.batch.model.SolrInteraction;
 import org.hupo.psi.mi.psicquic.indexing.batch.reader.MitabCalimochoLineMapper;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.solr.core.SolrOperations;
+import org.springframework.data.solr.core.query.SimpleQuery;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import psidev.psi.mi.calimocho.solr.converter.Converter;
 
 /**
@@ -23,15 +28,27 @@ import psidev.psi.mi.calimocho.solr.converter.Converter;
  * @version $Id$
  * @since <pre>12/07/12</pre>
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration( locations = {
+        "classpath*:/META-INF/psicquic-spring.xml",
+        "classpath*:/jobs/psicquic-indexing-spring-test.xml"
+})
+public class SolrCleanerTaskletUnitTest {
 
-public class SolrCleanerTaskletUnitTest extends AbstractSolrServerTest {
+    @Autowired
+    private SolrOperations solrTemplate;
+
+    @Before
+    public void clearRepo() {
+        solrTemplate.delete(SolrInteraction.INTERACTIONS_CORE_NAME, new SimpleQuery("*:*"));
+    }
 
     @Test
     public void test_delete_all() throws Exception {
 
-        String solrUr= "http://127.0.0.1:18080/solr";
-        SolrCleanerTasklet tasklet = new SolrCleanerTasklet();
-        tasklet.setSolrUrl(solrUr);
+        SolrCleanerTasklet<SolrInteraction> tasklet = new SolrCleanerTasklet<>();
+        tasklet.setSolrTemplate(solrTemplate);
+        tasklet.setSolrCollection(SolrInteraction.INTERACTIONS_CORE_NAME);
 
         // add some data to the solrServer
         Converter solrConverter = new Converter();
@@ -41,20 +58,19 @@ public class SolrCleanerTaskletUnitTest extends AbstractSolrServerTest {
         Row row = mitabLineMapper.mapLine(mitab27, 0);
 
         // index data to be hosted by PSICQUIC : we should have one result
-        SolrServer solrServer = solrJettyRunner.getSolrServer();
-        SolrInputDocument solrInputDoc = solrConverter.toSolrDocument(row);
-        solrServer.add(solrInputDoc);
-        solrServer.commit();
+        SolrInteraction solrInputDoc = new SolrInteraction(solrConverter.toSolrDocument(row));
+        solrTemplate.saveDocument(SolrInteraction.INTERACTIONS_CORE_NAME, solrInputDoc);
+        solrTemplate.commit(SolrInteraction.INTERACTIONS_CORE_NAME);
 
-        Assert.assertEquals(1L, solrServer.query(new SolrQuery("*:*")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("*:*")).getResults().getNumFound());
 
         // run the tasklet
-        StepExecution stepExecution = new StepExecution("stepTest", new JobExecution(new Long(1)));
+        StepExecution stepExecution = new StepExecution("stepTest", new JobExecution(1L));
         StepContribution stepContribution = new StepContribution(stepExecution);
         RepeatStatus status = tasklet.execute(stepContribution, new ChunkContext(new StepContext(stepExecution)));
 
         // the index should be empty
         Assert.assertEquals(RepeatStatus.FINISHED, status);
-        Assert.assertEquals(0L, solrServer.query(new SolrQuery("*:*")).getResults().getNumFound());
+        Assert.assertEquals(0L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("*:*")).getResults().getNumFound());
     }
 }

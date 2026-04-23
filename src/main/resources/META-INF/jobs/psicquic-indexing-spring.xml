@@ -19,16 +19,20 @@
     <!-- writer -->
 
     <bean id="solrWriter" class="org.hupo.psi.mi.psicquic.indexing.batch.writer.SolrItemWriter">
-        <property name="solrUrl" value="${solr.url}"/>
+        <property name="solrTemplate" ref="solrTemplate"/>
+        <property name="solrCollection" value="interactions"/>
+        <property name="solrConverter" ref="solrInteractionConverter"/>
     </bean>
 
     <bean id="solrCleanerTasklet" class="org.hupo.psi.mi.psicquic.indexing.batch.tasklet.SolrCleanerTasklet">
-        <property name="solrUrl" value="${solr.url}"/>
+        <property name="solrTemplate" ref="solrTemplate"/>
+        <property name="solrCollection" value="interactions"/>
     </bean>
 
     <!-- retry listener -->
     <bean id="solrServerRollbackListener" class="org.hupo.psi.mi.psicquic.indexing.batch.listener.SolrServerRollbackListener">
-        <property name="solrUrl" value="${solr.url}"/>
+        <property name="solrTemplate" ref="solrTemplate"/>
+        <property name="solrCollection" value="interactions"/>
         <property name="numberOfRetries" value="5"/>
     </bean>
 
