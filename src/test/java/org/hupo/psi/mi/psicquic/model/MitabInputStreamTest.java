@@ -1,10 +1,10 @@
 package org.hupo.psi.mi.psicquic.model;
 
-import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocumentList;
 import org.hupo.psi.mi.psicquic.indexing.batch.SolrMitabIndexer;
+import org.hupo.psi.mi.psicquic.indexing.batch.model.SolrInteraction;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,6 +13,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.solr.core.SolrOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import psidev.psi.mi.tab.PsimiTabException;
@@ -40,7 +41,7 @@ public class MitabInputStreamTest {
     @Autowired
     private SolrMitabIndexer solrMitabIndexer;
     @Autowired
-    private SolrClient solrClient;
+    private SolrOperations solrTemplate;
 
     private final PsimiTabReader mitabReader = new PsimiTabReader();
 
@@ -49,7 +50,7 @@ public class MitabInputStreamTest {
 
         solrMitabIndexer.startJob("mitabIndexNegativeJob");
 
-        SolrDocumentList solrResults = solrClient.query(new SolrQuery("*:*")).getResults();
+        SolrDocumentList solrResults = solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("*:*")).getResults();
         MitabInputStream mitabInput = new MitabInputStream(solrResults, PsicquicSolrServer.DATA_FIELDS_25);
 
         Collection<BinaryInteraction> binaryInteractions = mitabReader.read(mitabInput);
@@ -90,7 +91,7 @@ public class MitabInputStreamTest {
 
         solrMitabIndexer.startJob("mitabIndexNegativeJob");
 
-        SolrDocumentList solrResults = solrClient.query(new SolrQuery("*:*")).getResults();
+        SolrDocumentList solrResults = solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("*:*")).getResults();
         MitabInputStream mitabInput = new MitabInputStream(solrResults, PsicquicSolrServer.DATA_FIELDS_26);
 
         Collection<BinaryInteraction> binaryInteractions = mitabReader.read(mitabInput);
@@ -134,7 +135,7 @@ public class MitabInputStreamTest {
 
         solrMitabIndexer.startJob("mitabIndexNegativeJob");
 
-        SolrDocumentList solrResults = solrClient.query(new SolrQuery("*:*")).getResults();
+        SolrDocumentList solrResults = solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("*:*")).getResults();
         MitabInputStream mitabInput = new MitabInputStream(solrResults, PsicquicSolrServer.DATA_FIELDS_27);
 
         Collection<BinaryInteraction> binaryInteractions = mitabReader.read(mitabInput);
@@ -169,7 +170,7 @@ public class MitabInputStreamTest {
 
         solrMitabIndexer.startJob("mitabIndexMitab28Job");
 
-        SolrDocumentList solrResults = solrClient.query(new SolrQuery("idA:P05556")).getResults();
+        SolrDocumentList solrResults = solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("idA:P05556")).getResults();
         MitabInputStream mitabInput = new MitabInputStream(solrResults, PsicquicSolrServer.DATA_FIELDS_28);
 
         Collection<BinaryInteraction> binaryInteractions = mitabReader.read(mitabInput);

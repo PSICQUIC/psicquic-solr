@@ -7,7 +7,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.data.solr.repository.SolrCrudRepository;
+import org.springframework.data.solr.core.SolrOperations;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +22,11 @@ import java.util.List;
 
 public class SolrItemWriter<T extends SolrInputDocument> implements ItemWriter<Row>, ItemStream {
 
-    private SolrCrudRepository<T, String> solrCrudRepository;
-    protected SolrInputDocumentConverter<T> solrConverter;
+    private SolrOperations solrTemplate;
+    private String solrCollection;
+    private SolrInputDocumentConverter<T> solrConverter;
+
+    private boolean needToCommitOnClose;
 
     /**
      * Index a list of calimocho rows in SOLR
@@ -31,32 +34,66 @@ public class SolrItemWriter<T extends SolrInputDocument> implements ItemWriter<R
      * @throws Exception if anything
      */
     public void write(List<? extends Row> items) throws Exception {
+        needToCommitOnClose = false;
+
+        if (solrTemplate == null) {
+            throw new IllegalStateException("No 'solrTemplate' configured for SolrItemWriter");
+        }
+        if (solrCollection == null) {
+            throw new IllegalStateException("No 'solrCollection' configured for SolrItemWriter");
+        }
+
         if (items.isEmpty()) {
             return;
         }
 
-        List<T> solrInputDocuments = new ArrayList<>();
+        List<SolrInputDocument> solrInputDocuments = new ArrayList<>();
         for (Row row : items) {
             solrInputDocuments.add(solrConverter.toSolrDocument(row));
         }
-        solrCrudRepository.save(solrInputDocuments);
+        solrTemplate.saveDocuments(solrCollection, solrInputDocuments);
     }
 
     public void open(ExecutionContext executionContext) throws ItemStreamException {
     }
 
     public void update(ExecutionContext executionContext) throws ItemStreamException {
+        if (solrTemplate != null) {
+            try {
+                solrTemplate.commit(solrCollection);
+                needToCommitOnClose = true;
+            } catch (Exception e) {
+                throw new ItemStreamException("Problem committing the results.", e);
+            }
+        }
     }
 
     public void close() throws ItemStreamException {
+        if (solrTemplate != null) {
+            try {
+                if (needToCommitOnClose) {
+                    solrTemplate.commit(solrCollection);
+                }
+            } catch (Exception e) {
+                throw new ItemStreamException("Problem committing the results.", e);
+            }
+        }
     }
 
-    public SolrCrudRepository<T, String> getSolrCrudRepository() {
-        return solrCrudRepository;
+    public SolrOperations getSolrTemplate() {
+        return solrTemplate;
     }
 
-    public void setSolrCrudRepository(SolrCrudRepository<T, String> solrCrudRepository) {
-        this.solrCrudRepository = solrCrudRepository;
+    public void setSolrTemplate(SolrOperations solrTemplate) {
+        this.solrTemplate = solrTemplate;
+    }
+
+    public String getSolrCollection() {
+        return solrCollection;
+    }
+
+    public void setSolrCollection(String solrCollection) {
+        this.solrCollection = solrCollection;
     }
 
     public SolrInputDocumentConverter<T> getSolrConverter() {

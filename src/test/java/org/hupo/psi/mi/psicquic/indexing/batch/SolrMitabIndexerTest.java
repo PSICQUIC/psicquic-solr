@@ -1,13 +1,14 @@
 package org.hupo.psi.mi.psicquic.indexing.batch;
 
-import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.hupo.psi.mi.psicquic.indexing.batch.model.SolrInteraction;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.solr.core.SolrOperations;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -33,101 +34,101 @@ public class SolrMitabIndexerTest {
     @Autowired
     private SolrMitabIndexer solrMitabIndexer;
     @Autowired
-    private SolrClient solrClient;
+    private SolrOperations solrTemplate;
 
     @Test
     public void test_indexing_negative() throws Exception {
 
         solrMitabIndexer.startJob("mitabIndexNegativeJob");
 
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("*:*")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("*:*")).getResults().getNumFound());
         // two negative, two positive
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("negative:true")).getResults().getNumFound());
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("negative:false")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("negative:true")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("negative:false")).getResults().getNumFound());
 
         // test idA and idB -> identifier and id
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("id:P07228")).getResults().getNumFound());
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("identifier:P07228")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("idA:P07228")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("idB:P07228")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("id:P07228")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("identifier:P07228")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("idA:P07228")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("idB:P07228")).getResults().getNumFound());
 
         // test altidA and altidB -> identifier and id
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("id:EBI-5606437")).getResults().getNumFound());
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("identifier:EBI-5606437")).getResults().getNumFound());
-        Assert.assertEquals(0L, solrClient.query(new SolrQuery("idA:EBI-5606437")).getResults().getNumFound());
-        Assert.assertEquals(0L, solrClient.query(new SolrQuery("idB:EBI-5606437")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("id:EBI-5606437")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("identifier:EBI-5606437")).getResults().getNumFound());
+        Assert.assertEquals(0L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("idA:EBI-5606437")).getResults().getNumFound());
+        Assert.assertEquals(0L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("idB:EBI-5606437")).getResults().getNumFound());
 
         // test altiasA and aliasB -> identifier and alias
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("alias:RGD-receptor")).getResults().getNumFound());
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("identifier:RGD-receptor")).getResults().getNumFound());
-        Assert.assertEquals(0L, solrClient.query(new SolrQuery("idA:RGD-receptor")).getResults().getNumFound());
-        Assert.assertEquals(0L, solrClient.query(new SolrQuery("idB:RGD-receptor")).getResults().getNumFound());
-        Assert.assertEquals(0L, solrClient.query(new SolrQuery("id:RGD-receptor")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("alias:RGD-receptor")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("identifier:RGD-receptor")).getResults().getNumFound());
+        Assert.assertEquals(0L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("idA:RGD-receptor")).getResults().getNumFound());
+        Assert.assertEquals(0L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("idB:RGD-receptor")).getResults().getNumFound());
+        Assert.assertEquals(0L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("id:RGD-receptor")).getResults().getNumFound());
 
         // test detmethod
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("detmethod:\"two hybrid\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("detmethod:\"two hybrid\"")).getResults().getNumFound());
 
         // test author
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("pubauth:\"Loo DT et al.(1998)\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pubauth:\"Loo DT et al.(1998)\"")).getResults().getNumFound());
 
         // test pub id
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("pubid:9722563")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("pubid:imex")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pubid:9722563")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pubid:imex")).getResults().getNumFound());
 
         // test protein species
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("taxidA:\"human-jurkat\"")).getResults().getNumFound());
-        Assert.assertEquals(0L, solrClient.query(new SolrQuery("taxidB:\"human-jurkat\"")).getResults().getNumFound());
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("species:\"human-jurkat\"")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("taxidA:\"human-jurkat\"")).getResults().getNumFound());
+        Assert.assertEquals(0L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("taxidB:\"human-jurkat\"")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("species:\"human-jurkat\"")).getResults().getNumFound());
 
         // test interaction type
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("type:\"MI:0407\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("type:\"MI:0407\"")).getResults().getNumFound());
 
         // test interaction id
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("interaction_id:EBI-5630468")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("interaction_id:EBI-5630468")).getResults().getNumFound());
 
         // test biorole
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("pbioroleA:\"unspecified role\"")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("pbioroleB:\"unspecified role\"")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("pbiorole:\"unspecified role\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pbioroleA:\"unspecified role\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pbioroleB:\"unspecified role\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pbiorole:\"unspecified role\"")).getResults().getNumFound());
 
         // test interactor type
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("ptypeA:protein")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("ptypeB:protein")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("ptype:protein")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("ptypeA:protein")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("ptypeB:protein")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("ptype:protein")).getResults().getNumFound());
 
         // test interactor type
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("ptypeA:protein")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("ptypeB:protein")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("ptype:protein")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("ptypeA:protein")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("ptypeB:protein")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("ptype:protein")).getResults().getNumFound());
 
         // test interactor xref
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("pxrefA:\"GO:0008305\"")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("pxrefB:\"GO:0008305\"")).getResults().getNumFound());
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("pxref:\"GO:0008305\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pxrefA:\"GO:0008305\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pxrefB:\"GO:0008305\"")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pxref:\"GO:0008305\"")).getResults().getNumFound());
 
         // test interaction xref
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("xref:\"IM-17229-4\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("xref:\"IM-17229-4\"")).getResults().getNumFound());
 
         // test interaction annotations
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("annot:\"Fig. 1.\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("annot:\"Fig. 1.\"")).getResults().getNumFound());
 
         // test udate
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("udate:[20120301 TO 20120302]")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("udate:[20120301 TO 20120302]")).getResults().getNumFound());
 
         // test feature
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("ftypeA:\"necessary binding region\"")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("ftypeB:\"necessary binding region\"")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("ftype:\"necessary binding region\"")).getResults().getNumFound());
-        Assert.assertEquals(0L, solrClient.query(new SolrQuery("ftypeA:2171-2647")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("ftypeA:\"necessary binding region\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("ftypeB:\"necessary binding region\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("ftype:\"necessary binding region\"")).getResults().getNumFound());
+        Assert.assertEquals(0L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("ftypeA:2171-2647")).getResults().getNumFound());
 
         // test stc
-        Assert.assertEquals(0L, solrClient.query(new SolrQuery("stc:true")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("stc:false")).getResults().getNumFound());
+        Assert.assertEquals(0L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("stc:true")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("stc:false")).getResults().getNumFound());
 
         // test participant detection method
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("pmethodA:\"MI:0981\"")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("pmethodB:\"MI:0981\"")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("pmethod:\"MI:0981\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pmethodA:\"MI:0981\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pmethodB:\"MI:0981\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pmethod:\"MI:0981\"")).getResults().getNumFound());
     }
 
     @Test
@@ -138,110 +139,110 @@ public class SolrMitabIndexerTest {
 
         solrMitabIndexer.startJob("mitabIndexMitab28Job");
 
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("*:*")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("*:*")).getResults().getNumFound());
 
         // two negative, two positive
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("negative:true")).getResults().getNumFound());
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("negative:false")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("negative:true")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("negative:false")).getResults().getNumFound());
 
         // test idA and idB -> identifier and id
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("id:P07228")).getResults().getNumFound());
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("identifier:P07228")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("idA:P07228")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("idB:P07228")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("id:P07228")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("identifier:P07228")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("idA:P07228")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("idB:P07228")).getResults().getNumFound());
 
         // test altidA and altidB -> identifier and id
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("id:EBI-5606437")).getResults().getNumFound());
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("identifier:EBI-5606437")).getResults().getNumFound());
-        Assert.assertEquals(0L, solrClient.query(new SolrQuery("idA:EBI-5606437")).getResults().getNumFound());
-        Assert.assertEquals(0L, solrClient.query(new SolrQuery("idB:EBI-5606437")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("id:EBI-5606437")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("identifier:EBI-5606437")).getResults().getNumFound());
+        Assert.assertEquals(0L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("idA:EBI-5606437")).getResults().getNumFound());
+        Assert.assertEquals(0L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("idB:EBI-5606437")).getResults().getNumFound());
 
         // test altiasA and aliasB -> identifier and alias
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("alias:RGD-receptor")).getResults().getNumFound());
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("identifier:RGD-receptor")).getResults().getNumFound());
-        Assert.assertEquals(0L, solrClient.query(new SolrQuery("idA:RGD-receptor")).getResults().getNumFound());
-        Assert.assertEquals(0L, solrClient.query(new SolrQuery("idB:RGD-receptor")).getResults().getNumFound());
-        Assert.assertEquals(0L, solrClient.query(new SolrQuery("id:RGD-receptor")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("alias:RGD-receptor")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("identifier:RGD-receptor")).getResults().getNumFound());
+        Assert.assertEquals(0L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("idA:RGD-receptor")).getResults().getNumFound());
+        Assert.assertEquals(0L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("idB:RGD-receptor")).getResults().getNumFound());
+        Assert.assertEquals(0L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("id:RGD-receptor")).getResults().getNumFound());
 
         // test detmethod
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("detmethod:\"two hybrid\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("detmethod:\"two hybrid\"")).getResults().getNumFound());
 
         // test author
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("pubauth:\"Loo DT et al.(1998)\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pubauth:\"Loo DT et al.(1998)\"")).getResults().getNumFound());
 
         // test pub id
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("pubid:9722563")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("pubid:imex")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pubid:9722563")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pubid:imex")).getResults().getNumFound());
 
         // test protein species
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("taxidA:\"human-jurkat\"")).getResults().getNumFound());
-        Assert.assertEquals(0L, solrClient.query(new SolrQuery("taxidB:\"human-jurkat\"")).getResults().getNumFound());
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("species:\"human-jurkat\"")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("taxidA:\"human-jurkat\"")).getResults().getNumFound());
+        Assert.assertEquals(0L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("taxidB:\"human-jurkat\"")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("species:\"human-jurkat\"")).getResults().getNumFound());
 
         // test interaction type
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("type:\"MI:0407\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("type:\"MI:0407\"")).getResults().getNumFound());
 
         // test interaction id
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("interaction_id:EBI-5630468")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("interaction_id:EBI-5630468")).getResults().getNumFound());
 
         // test biorole
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("pbioroleA:\"unspecified role\"")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("pbioroleB:\"unspecified role\"")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("pbiorole:\"unspecified role\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pbioroleA:\"unspecified role\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pbioroleB:\"unspecified role\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pbiorole:\"unspecified role\"")).getResults().getNumFound());
 
         // test interactor type
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("ptypeA:protein")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("ptypeB:protein")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("ptype:protein")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("ptypeA:protein")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("ptypeB:protein")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("ptype:protein")).getResults().getNumFound());
 
         // test interactor type
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("ptypeA:protein")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("ptypeB:protein")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("ptype:protein")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("ptypeA:protein")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("ptypeB:protein")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("ptype:protein")).getResults().getNumFound());
 
         // test interactor xref
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("pxrefA:\"GO:0008305\"")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("pxrefB:\"GO:0008305\"")).getResults().getNumFound());
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("pxref:\"GO:0008305\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pxrefA:\"GO:0008305\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pxrefB:\"GO:0008305\"")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pxref:\"GO:0008305\"")).getResults().getNumFound());
 
         // test interaction xref
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("xref:\"IM-17229-4\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("xref:\"IM-17229-4\"")).getResults().getNumFound());
 
         // test interaction annotations
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("annot:\"Fig. 1.\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("annot:\"Fig. 1.\"")).getResults().getNumFound());
 
         // test udate
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("udate:[20120301 TO 20120302]")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("udate:[20120301 TO 20120302]")).getResults().getNumFound());
 
         // test feature
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("ftypeA:\"necessary binding region\"")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("ftypeB:\"necessary binding region\"")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("ftype:\"necessary binding region\"")).getResults().getNumFound());
-        Assert.assertEquals(0L, solrClient.query(new SolrQuery("ftypeA:2171-2647")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("ftypeA:\"necessary binding region\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("ftypeB:\"necessary binding region\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("ftype:\"necessary binding region\"")).getResults().getNumFound());
+        Assert.assertEquals(0L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("ftypeA:2171-2647")).getResults().getNumFound());
 
         // test stc
-        Assert.assertEquals(0L, solrClient.query(new SolrQuery("stc:true")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("stc:false")).getResults().getNumFound());
+        Assert.assertEquals(0L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("stc:true")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("stc:false")).getResults().getNumFound());
 
         // test participant detection method
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("pmethodA:\"MI:0981\"")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("pmethodB:\"MI:0981\"")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("pmethod:\"MI:0981\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pmethodA:\"MI:0981\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pmethodB:\"MI:0981\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pmethod:\"MI:0981\"")).getResults().getNumFound());
 
         // test bioeffect
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("bioeffect:\"kinase activity\"")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("bioeffectA:\"kinase activity\"")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("bioeffectB:\"antioxidant activity\"")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("bioeffect:\"GO:0016209\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("bioeffect:\"kinase activity\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("bioeffectA:\"kinase activity\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("bioeffectB:\"antioxidant activity\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("bioeffect:\"GO:0016209\"")).getResults().getNumFound());
 
         // test causalmechanism
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("causalmechanism:\"post transcriptional regulation\"")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("causalmechanism:\"MI:2249\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("causalmechanism:\"post transcriptional regulation\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("causalmechanism:\"MI:2249\"")).getResults().getNumFound());
 
         // test causalstatement
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("causalstatement:\"down regulates\"")).getResults().getNumFound());
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("causalstatement:\"up regulates\"")).getResults().getNumFound());
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("causalstatement:\"MI:2235\"")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("causalstatement:\"down regulates\"")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("causalstatement:\"up regulates\"")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("causalstatement:\"MI:2235\"")).getResults().getNumFound());
     }
 
     @Test
@@ -249,20 +250,20 @@ public class SolrMitabIndexerTest {
 
         solrMitabIndexer.startJob("mitabIndexParameterJob");
 
-        Assert.assertEquals(14L, solrClient.query(new SolrQuery("*:*")).getResults().getNumFound());
+        Assert.assertEquals(14L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("*:*")).getResults().getNumFound());
         // two parameters
-        Assert.assertEquals(3L, solrClient.query(new SolrQuery("param:true")).getResults().getNumFound());
-        Assert.assertEquals(11L, solrClient.query(new SolrQuery("param:false")).getResults().getNumFound());
+        Assert.assertEquals(3L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("param:true")).getResults().getNumFound());
+        Assert.assertEquals(11L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("param:false")).getResults().getNumFound());
 
         // test spoke expansion
-        Assert.assertEquals(8L, solrClient.query(new SolrQuery("complex:\"MI:1060\"")).getResults().getNumFound());
-        Assert.assertEquals(8L, solrClient.query(new SolrQuery("complex:\"spoke expansion\"")).getResults().getNumFound());
-        Assert.assertEquals(8L, solrClient.query(new SolrQuery("complex:\"psi-mi:MI:1060\"")).getResults().getNumFound());
+        Assert.assertEquals(8L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("complex:\"MI:1060\"")).getResults().getNumFound());
+        Assert.assertEquals(8L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("complex:\"spoke expansion\"")).getResults().getNumFound());
+        Assert.assertEquals(8L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("complex:\"psi-mi:MI:1060\"")).getResults().getNumFound());
         //psi-mi:"MI:1060"(spoke expansion)
 
         // test stc
-        Assert.assertEquals(3L, solrClient.query(new SolrQuery("stc:true")).getResults().getNumFound());
-        Assert.assertEquals(11L, solrClient.query(new SolrQuery("stc:false")).getResults().getNumFound());
+        Assert.assertEquals(3L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("stc:true")).getResults().getNumFound());
+        Assert.assertEquals(11L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("stc:false")).getResults().getNumFound());
     }
 
     @Test
@@ -270,103 +271,103 @@ public class SolrMitabIndexerTest {
 
         solrMitabIndexer.startJob("mitabIndexNegativeJob");
 
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("*:*")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("*:*")).getResults().getNumFound());
 
         // test idA and idB -> identifier and id
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("id:uniprotkb")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("identifier:uniprotkb")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("idA:uniprotkb")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("idB:uniprotkb")).getResults().getNumFound());
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("id:\"uniprotkb:P07228\"")).getResults().getNumFound());
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("identifier:\"uniprotkb:P07228\"")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("idA:\"uniprotkb:P07228\"")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("idB:\"uniprotkb:P07228\"")).getResults().getNumFound());
-        Assert.assertEquals(0L, solrClient.query(new SolrQuery("idB:\"ensembl:P07228\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("id:uniprotkb")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("identifier:uniprotkb")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("idA:uniprotkb")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("idB:uniprotkb")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("id:\"uniprotkb:P07228\"")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("identifier:\"uniprotkb:P07228\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("idA:\"uniprotkb:P07228\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("idB:\"uniprotkb:P07228\"")).getResults().getNumFound());
+        Assert.assertEquals(0L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("idB:\"ensembl:P07228\"")).getResults().getNumFound());
 
         // test altidA and altidB -> identifier and id
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("id:intact")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("identifier:intact")).getResults().getNumFound());
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("id:\"intact:EBI-5606437\"")).getResults().getNumFound());
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("identifier:\"intact:EBI-5606437\"")).getResults().getNumFound());
-        Assert.assertEquals(0L, solrClient.query(new SolrQuery("identifier:\"uniprotkb:EBI-5606437\"")).getResults().getNumFound());
-        Assert.assertEquals(0L, solrClient.query(new SolrQuery("idA:\"intact:EBI-5606437\"")).getResults().getNumFound());
-        Assert.assertEquals(0L, solrClient.query(new SolrQuery("idB:\"intact:EBI-5606437\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("id:intact")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("identifier:intact")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("id:\"intact:EBI-5606437\"")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("identifier:\"intact:EBI-5606437\"")).getResults().getNumFound());
+        Assert.assertEquals(0L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("identifier:\"uniprotkb:EBI-5606437\"")).getResults().getNumFound());
+        Assert.assertEquals(0L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("idA:\"intact:EBI-5606437\"")).getResults().getNumFound());
+        Assert.assertEquals(0L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("idB:\"intact:EBI-5606437\"")).getResults().getNumFound());
 
         // test altiasA and aliasB -> identifier and alias
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("alias:uniprotkb")).getResults().getNumFound());
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("alias:\"uniprotkb:RGD-receptor\"")).getResults().getNumFound());
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("identifier:\"uniprotkb:RGD-receptor\"")).getResults().getNumFound());
-        Assert.assertEquals(0L, solrClient.query(new SolrQuery("alias:\"intact:RGD-receptor\"")).getResults().getNumFound());
-        Assert.assertEquals(0L, solrClient.query(new SolrQuery("idA:\"uniprotkb:RGD-receptor\"")).getResults().getNumFound());
-        Assert.assertEquals(0L, solrClient.query(new SolrQuery("idB:\"uniprotkb:RGD-receptor\"")).getResults().getNumFound());
-        Assert.assertEquals(0L, solrClient.query(new SolrQuery("id:\"uniprotkb:RGD-receptor\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("alias:uniprotkb")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("alias:\"uniprotkb:RGD-receptor\"")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("identifier:\"uniprotkb:RGD-receptor\"")).getResults().getNumFound());
+        Assert.assertEquals(0L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("alias:\"intact:RGD-receptor\"")).getResults().getNumFound());
+        Assert.assertEquals(0L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("idA:\"uniprotkb:RGD-receptor\"")).getResults().getNumFound());
+        Assert.assertEquals(0L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("idB:\"uniprotkb:RGD-receptor\"")).getResults().getNumFound());
+        Assert.assertEquals(0L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("id:\"uniprotkb:RGD-receptor\"")).getResults().getNumFound());
 
         // test detmethod
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("detmethod:\"psi-mi\"")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("detmethod:\"MI:0018\"")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("detmethod:\"psi-mi:MI:0018\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("detmethod:\"psi-mi\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("detmethod:\"MI:0018\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("detmethod:\"psi-mi:MI:0018\"")).getResults().getNumFound());
 
         // test pub id
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("pubid:\"pubmed:9722563\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pubid:\"pubmed:9722563\"")).getResults().getNumFound());
 
         // test protein species
-        Assert.assertEquals(3L, solrClient.query(new SolrQuery("taxidA:9606")).getResults().getNumFound());
-        Assert.assertEquals(3L, solrClient.query(new SolrQuery("taxidB:\"taxid:9606\"")).getResults().getNumFound());
+        Assert.assertEquals(3L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("taxidA:9606")).getResults().getNumFound());
+        Assert.assertEquals(3L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("taxidB:\"taxid:9606\"")).getResults().getNumFound());
 
         // test interaction type
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("type:\"direct interaction\"")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("type:\"psi-mi:MI:0407\"")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("type:psi-mi")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("type:\"direct interaction\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("type:\"psi-mi:MI:0407\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("type:psi-mi")).getResults().getNumFound());
 
         // test interaction id
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("interaction_id:\"intact:EBI-5630468\"")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("interaction_id:intact")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("interaction_id:\"intact:EBI-5630468\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("interaction_id:intact")).getResults().getNumFound());
 
         // test biorole
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("pbioroleA:\"psi-mi:MI:0499\"")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("pbioroleB:\"psi-mi:MI:0499\"")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("pbiorole:\"psi-mi:MI:0499\"")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("pbioroleA:\"psi-mi:MI:0499\"")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("pbioroleB:psi-mi")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("pbiorole:psi-mi")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pbioroleA:\"psi-mi:MI:0499\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pbioroleB:\"psi-mi:MI:0499\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pbiorole:\"psi-mi:MI:0499\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pbioroleA:\"psi-mi:MI:0499\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pbioroleB:psi-mi")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pbiorole:psi-mi")).getResults().getNumFound());
 
         // test interactor type
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("ptypeA:psi-mi")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("ptypeB:psi-mi")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("ptype:psi-mi")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("ptypeA:\"psi-mi:MI:0326\"")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("ptypeB:\"psi-mi:MI:0326\"")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("ptype:\"psi-mi:MI:0326\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("ptypeA:psi-mi")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("ptypeB:psi-mi")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("ptype:psi-mi")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("ptypeA:\"psi-mi:MI:0326\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("ptypeB:\"psi-mi:MI:0326\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("ptype:\"psi-mi:MI:0326\"")).getResults().getNumFound());
 
         // test interactor xref
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("pxrefA:go")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("pxrefB:go")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("pxref:go")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("pxrefA:\"go:GO:0008305\"")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("pxrefB:\"go:GO:0008305\"")).getResults().getNumFound());
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("pxref:\"go:GO:0008305\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pxrefA:go")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pxrefB:go")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pxref:go")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pxrefA:\"go:GO:0008305\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pxrefB:\"go:GO:0008305\"")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pxref:\"go:GO:0008305\"")).getResults().getNumFound());
 
         // test interaction xref
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("xref:\"imex:IM-17229-4\"")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("xref:imex")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("xref:\"imex:IM-17229-4\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("xref:imex")).getResults().getNumFound());
 
         // test interaction annotations
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("annot:\"figure legend\"")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("annot:\"figure legend:Fig. 1.\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("annot:\"figure legend\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("annot:\"figure legend:Fig. 1.\"")).getResults().getNumFound());
 
         // test udate
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("udate:20120301")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("udate:20120301")).getResults().getNumFound());
 
         // test participant detection method
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("pmethodA:\"psi-mi:MI:0981\"")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("pmethodB:\"psi-mi:MI:0981\"")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("pmethod:\"psi-mi:MI:0981\"")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("pmethodA:\"tag visualisation by peroxidase activity\"")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("pmethodB:\"tag visualisation by peroxidase activity\"")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("pmethod:\"tag visualisation by peroxidase activity\"")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("pmethodA:psi-mi")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("pmethodB:psi-mi")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("pmethod:psi-mi")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pmethodA:\"psi-mi:MI:0981\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pmethodB:\"psi-mi:MI:0981\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pmethod:\"psi-mi:MI:0981\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pmethodA:\"tag visualisation by peroxidase activity\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pmethodB:\"tag visualisation by peroxidase activity\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pmethod:\"tag visualisation by peroxidase activity\"")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pmethodA:psi-mi")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pmethodB:psi-mi")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("pmethod:psi-mi")).getResults().getNumFound());
     }
 
     @Test
@@ -374,7 +375,7 @@ public class SolrMitabIndexerTest {
 
         solrMitabIndexer.startJob("mitabIndexParameterJob");
 
-        SolrDocumentList results = solrClient.query(new SolrQuery("interaction_id:EBI-4321313")).getResults();
+        SolrDocumentList results = solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("interaction_id:EBI-4321313")).getResults();
 
         Iterator<SolrDocument> iterator = results.iterator();
 
@@ -512,7 +513,7 @@ public class SolrMitabIndexerTest {
 
         solrMitabIndexer.startJob("mitabIndexMitab28Job");
 
-        SolrDocumentList results = solrClient.query(new SolrQuery("idA:P07228")).getResults();
+        SolrDocumentList results = solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("idA:P07228")).getResults();
         Assert.assertEquals(1, results.getNumFound());
 
         Iterator<SolrDocument> iterator = results.iterator();
@@ -663,12 +664,12 @@ public class SolrMitabIndexerTest {
         // first time should fail after 2 readings
         solrMitabIndexer.startJob("mitabIndexFailingJob");
 
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("*:*")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("*:*")).getResults().getNumFound());
 
         // it should resume and continue
         solrMitabIndexer.resumeJob("mitabIndexFailingJob");
 
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("*:*")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("*:*")).getResults().getNumFound());
     }
 
     @Test
@@ -678,7 +679,7 @@ public class SolrMitabIndexerTest {
         // first time should fail after 2 readings
         solrMitabIndexer.startJob("mitabIndexRetryJob");
 
-        Assert.assertEquals(4L, solrClient.query(new SolrQuery("*:*")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("*:*")).getResults().getNumFound());
 
     }
 }

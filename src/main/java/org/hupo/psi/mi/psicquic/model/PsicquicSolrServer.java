@@ -1,18 +1,16 @@
 package org.hupo.psi.mi.psicquic.model;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.FacetParams;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.data.solr.core.SolrOperations;
 import psidev.psi.mi.calimocho.solr.converter.SolrFieldName;
 import psidev.psi.mi.tab.PsimiTabReader;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -26,9 +24,7 @@ import java.util.Map;
  * @since <pre>12/06/12</pre>
  */
 
-public class PsicquicSolrServer implements Closeable {
-
-    private final Logger logger = LoggerFactory.getLogger(PsicquicSolrServer.class);
+public class PsicquicSolrServer {
 
     // static final variables
     protected final static String STORED_FIELD_EXTENSION="_o";
@@ -48,7 +44,8 @@ public class PsicquicSolrServer implements Closeable {
     /**
      * solr server
      */
-    protected SolrClient solrClient;
+    protected final SolrOperations solrOperations;
+    protected final String solrCollection;
     /**
      * MITAB reader
      */
@@ -119,11 +116,15 @@ public class PsicquicSolrServer implements Closeable {
             SolrFieldName.causalmechanism+STORED_FIELD_EXTENSION, SolrFieldName.causalstatement+STORED_FIELD_EXTENSION
     };
 
-    public PsicquicSolrServer(SolrClient solrClient) {
-        this.solrClient = solrClient;
+    public PsicquicSolrServer(SolrOperations solrOperations, String solrCollection) {
+        this.solrOperations = solrOperations;
+        this.solrCollection = solrCollection;
 
-        if (this.solrClient == null){
-            throw new IllegalArgumentException("Cannot create a new PsicquicSolrServer if the SolrClient is null");
+        if (this.solrOperations == null){
+            throw new IllegalArgumentException("Cannot create a new PsicquicSolrServer if the solrOperations is null");
+        }
+        if (this.solrCollection == null){
+            throw new IllegalArgumentException("Cannot create a new PsicquicSolrServer if the solrCollection is null");
         }
 
         // initialise default solr field map
@@ -174,12 +175,12 @@ public class PsicquicSolrServer implements Closeable {
 
         // use dismax parser for querying default fields
         //solrQuery.setParam(DISMAX_PARAM_NAME, SolrFieldName.identifier.toString(), SolrFieldName.pubid.toString(), SolrFieldName.pubauth.toString(), SolrFieldName.species.toString(), SolrFieldName.detmethod.toString(), SolrFieldName.type.toString(), SolrFieldName.interaction_id.toString());
-        solrQuery.setParam(DISMAX_PARAM_NAME, SolrFieldName.identifier.toString() + " "
-                + SolrFieldName.pubid.toString() + " " + SolrFieldName.pubauth.toString() + " "
-                + SolrFieldName.species.toString() + " " + SolrFieldName.detmethod.toString() + " "
-                + SolrFieldName.type.toString() + " " + SolrFieldName.interaction_id.toString() + " "
-                + SolrFieldName.xref.toString() + " " + SolrFieldName.pxref.toString() + " "
-                + SolrFieldName.bioeffect.toString() + " " + SolrFieldName.causalstatement.toString());
+        solrQuery.setParam(DISMAX_PARAM_NAME, SolrFieldName.identifier + " "
+                + SolrFieldName.pubid + " " + SolrFieldName.pubauth + " "
+                + SolrFieldName.species + " " + SolrFieldName.detmethod + " "
+                + SolrFieldName.type + " " + SolrFieldName.interaction_id + " "
+                + SolrFieldName.xref + " " + SolrFieldName.pxref + " "
+                + SolrFieldName.bioeffect + " " + SolrFieldName.causalstatement);
         solrQuery.setParam(QUERY_TYPE, DISMAX_TYPE);
         solrQuery.setParam(DEFAULT_MM_PARAM, "1");
 
@@ -394,7 +395,7 @@ public class PsicquicSolrServer implements Closeable {
         }
 
         try {
-            org.apache.solr.client.solrj.response.QueryResponse solrResponse = solrClient.query(copy);
+            QueryResponse solrResponse = solrOperations.getSolrClient().query(solrCollection, copy);
 
             if (solrResponse == null){
                 return null;
@@ -437,9 +438,7 @@ public class PsicquicSolrServer implements Closeable {
     protected PsicquicSearchResults createSearchResults(SolrDocumentList docList, String returnType, List<FacetField> facetFields) throws PsicquicSolrException {
 
         String resultType = returnType != null ? returnType : RETURN_TYPE_DEFAULT;
-        PsicquicSearchResults results = createMitabResultsForType(docList, resultType, facetFields);
-
-        return results;
+        return createMitabResultsForType(docList, resultType, facetFields);
     }
 
     /**
@@ -458,16 +457,6 @@ public class PsicquicSolrServer implements Closeable {
             throw new PsicquicSolrException("The format " + mitabType + " is not a recognised MITAB format");
         }
 
-        PsicquicSearchResults searchResults = new PsicquicSearchResults(docList, fieldNames, facetFields);
-        return searchResults;
-    }
-
-    /**
-     * Shutdown solr servers
-     */
-    public void close() throws IOException {
-        if (this.solrClient != null){
-            solrClient.close();
-        }
+        return new PsicquicSearchResults(docList, fieldNames, facetFields);
     }
 }

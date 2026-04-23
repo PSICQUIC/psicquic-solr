@@ -49,20 +49,8 @@
         <constructor-arg value="src/test/resources/solr-home"/>
     </bean>
 
-    <bean id="solrClient" factory-bean="embeddedSolrServerFactory" factory-method="getSolrClient">
-        <constructor-arg value="interactions"/>
-    </bean>
-
-    <bean id="solrRepositoryFactory" class="org.springframework.data.solr.repository.support.SolrRepositoryFactory">
-        <constructor-arg ref="solrClient"/>
-    </bean>
-
-    <bean id="interactionRepository" factory-bean="solrRepositoryFactory" factory-method="getRepository">
-        <constructor-arg value="org.hupo.psi.mi.psicquic.indexing.batch.repository.InteractionRepository"/>
-    </bean>
-
-    <bean id="isEmbeddedSolr" class="java.lang.Boolean">
-        <constructor-arg value="false"/>
+    <bean id="solrTemplate" class="org.springframework.data.solr.core.SolrTemplate">
+        <constructor-arg ref="embeddedSolrServerFactory"/>
     </bean>
 
     <!-- writer -->
@@ -71,17 +59,27 @@
     </bean>
 
     <bean id="solrWriterTest" class="org.hupo.psi.mi.psicquic.indexing.batch.writer.SolrItemWriter">
-        <property name="solrCrudRepository" ref="interactionRepository"/>
+        <property name="solrTemplate" ref="solrTemplate"/>
+        <property name="solrCollection" value="interactions"/>
         <property name="solrConverter" ref="solrInteractionConverter"/>
     </bean>
 
     <bean id="failingSolrWriterTest" class="org.hupo.psi.mi.psicquic.indexing.batch.writer.SolrItemWriterThrowingSolrServerException">
-        <property name="solrCrudRepository" ref="interactionRepository"/>
+        <property name="solrTemplate" ref="solrTemplate"/>
+        <property name="solrCollection" value="interactions"/>
         <property name="solrConverter" ref="solrInteractionConverter"/>
     </bean>
 
     <bean id="solrCleanerTaskletTest" class="org.hupo.psi.mi.psicquic.indexing.batch.tasklet.SolrCleanerTasklet">
-        <property name="solrCrudRepository" ref="interactionRepository"/>
+        <property name="solrTemplate" ref="solrTemplate"/>
+        <property name="solrCollection" value="interactions"/>
+    </bean>
+
+    <!-- retry listener -->
+    <bean id="solrServerRollbackListenerTest" class="org.hupo.psi.mi.psicquic.indexing.batch.listener.SolrServerRollbackListener">
+        <property name="solrTemplate" ref="solrTemplate"/>
+        <property name="solrCollection" value="interactions"/>
+        <property name="numberOfRetries" value="5"/>
     </bean>
 
     <!-- steps -->
@@ -150,6 +148,10 @@
                 <batch:retryable-exception-classes>
                     <batch:include class="org.apache.solr.client.solrj.SolrServerException"/>
                 </batch:retryable-exception-classes>
+
+                <batch:retry-listeners>
+                    <batch:listener ref="solrServerRollbackListenerTest"/>
+                </batch:retry-listeners>
             </batch:chunk>
         </batch:tasklet>
     </batch:step>
@@ -171,6 +173,10 @@
                 <batch:retryable-exception-classes>
                     <batch:include class="org.apache.solr.client.solrj.SolrServerException"/>
                 </batch:retryable-exception-classes>
+
+                <batch:retry-listeners>
+                    <batch:listener ref="solrServerRollbackListenerTest"/>
+                </batch:retry-listeners>
             </batch:chunk>
         </batch:tasklet>
     </batch:step>
@@ -191,6 +197,10 @@
                 <batch:retryable-exception-classes>
                     <batch:include class="org.apache.solr.client.solrj.SolrServerException"/>
                 </batch:retryable-exception-classes>
+
+                <batch:retry-listeners>
+                    <batch:listener ref="solrServerRollbackListenerTest"/>
+                </batch:retry-listeners>
             </batch:chunk>
         </batch:tasklet>
     </batch:step>
@@ -211,6 +221,10 @@
                 <batch:retryable-exception-classes>
                     <batch:include class="org.apache.solr.client.solrj.SolrServerException"/>
                 </batch:retryable-exception-classes>
+
+                <batch:retry-listeners>
+                    <batch:listener ref="solrServerRollbackListenerTest"/>
+                </batch:retry-listeners>
             </batch:chunk>
         </batch:tasklet>
     </batch:step>

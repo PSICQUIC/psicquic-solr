@@ -1,11 +1,11 @@
 package org.hupo.psi.mi.psicquic.model;
 
-import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocumentList;
 import org.hupo.psi.calimocho.io.IllegalRowException;
 import org.hupo.psi.mi.psicquic.indexing.batch.SolrMitabIndexer;
+import org.hupo.psi.mi.psicquic.indexing.batch.model.SolrInteraction;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,6 +14,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.solr.core.SolrOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import psidev.psi.mi.tab.PsimiTabException;
@@ -44,14 +45,14 @@ public class PsicquicSearchResultsTest {
     @Autowired
     private SolrMitabIndexer solrMitabIndexer;
     @Autowired
-    private SolrClient solrClient;
+    private SolrOperations solrTemplate;
 
     @Test
     public void test_create_mitab_results() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException, SolrServerException, PsimiTabException, IOException {
 
         solrMitabIndexer.startJob("mitabIndexNegativeJob");
 
-        SolrDocumentList solrResults = solrClient.query(new SolrQuery("*:*")).getResults();
+        SolrDocumentList solrResults = solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("*:*")).getResults();
         PsicquicSearchResults psicquicSearchResults = new PsicquicSearchResults(solrResults, PsicquicSolrServer.DATA_FIELDS_27);
 
         InputStream mitabInputStream = psicquicSearchResults.getMitab();
@@ -75,7 +76,7 @@ public class PsicquicSearchResultsTest {
 
         solrMitabIndexer.startJob("mitabIndexNegativeJob");
 
-        SolrDocumentList solrResults = solrClient.query(new SolrQuery("*:*")).getResults();
+        SolrDocumentList solrResults = solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("*:*")).getResults();
         PsicquicSearchResults psicquicSearchResults = new PsicquicSearchResults(solrResults, PsicquicSolrServer.DATA_FIELDS_27);
 
         EntrySet xml = psicquicSearchResults.createEntrySet();
@@ -92,7 +93,7 @@ public class PsicquicSearchResultsTest {
 
         solrMitabIndexer.startJob("mitabIndexNegativeJob");
 
-        SolrDocumentList solrResults = solrClient.query(new SolrQuery("*:*")).getResults();
+        SolrDocumentList solrResults = solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("*:*")).getResults();
         PsicquicSearchResults psicquicSearchResults = new PsicquicSearchResults(solrResults, PsicquicSolrServer.DATA_FIELDS_27);
 
         InputStream xgmml = psicquicSearchResults.createXGMML();
@@ -107,7 +108,7 @@ public class PsicquicSearchResultsTest {
 
         solrMitabIndexer.startJob("mitabIndexNegativeJob");
 
-        SolrDocumentList solrResults = solrClient.query(new SolrQuery("*:*")).getResults();
+        SolrDocumentList solrResults = solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("*:*")).getResults();
         PsicquicSearchResults psicquicSearchResults = new PsicquicSearchResults(solrResults, PsicquicSolrServer.DATA_FIELDS_27);
 
         InputStream invalidFormat = psicquicSearchResults.createRDFOrBiopax("rdf");

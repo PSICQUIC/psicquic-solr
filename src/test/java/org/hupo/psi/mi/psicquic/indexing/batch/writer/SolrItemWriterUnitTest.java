@@ -1,18 +1,18 @@
 package org.hupo.psi.mi.psicquic.indexing.batch.writer;
 
-import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.hupo.psi.calimocho.model.Row;
 import org.hupo.psi.mi.psicquic.indexing.batch.converter.SolrInteractionConverter;
 import org.hupo.psi.mi.psicquic.indexing.batch.model.SolrInteraction;
 import org.hupo.psi.mi.psicquic.indexing.batch.reader.MitabCalimochoLineMapper;
-import org.hupo.psi.mi.psicquic.indexing.batch.repository.InteractionRepository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.solr.core.SolrOperations;
+import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -33,21 +33,20 @@ import java.util.List;
 public class SolrItemWriterUnitTest {
 
     @Autowired
-    private InteractionRepository interactionRepository;
+    private SolrOperations solrTemplate;
     @Autowired
     private SolrInteractionConverter solrInteractionConverter;
-    @Autowired
-    private SolrClient solrClient;
 
     @Before
     public void clearRepo() {
-        interactionRepository.deleteAll();
+        solrTemplate.delete(SolrInteraction.INTERACTIONS_CORE_NAME, new SimpleQuery("*:*"));
     }
 
     @Test
     public void test_write_mitab27_row() throws Exception {
         SolrItemWriter<SolrInteraction> writer = new SolrItemWriter<>();
-        writer.setSolrCrudRepository(interactionRepository);
+        writer.setSolrTemplate(solrTemplate);
+        writer.setSolrCollection(SolrInteraction.INTERACTIONS_CORE_NAME);
         writer.setSolrConverter(solrInteractionConverter);
 
         // add some data to the solrServer using writer
@@ -63,13 +62,14 @@ public class SolrItemWriterUnitTest {
         writer.update(context);
         writer.close();
 
-        Assert.assertEquals(1L, solrClient.query(new SolrQuery("*:*")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("*:*")).getResults().getNumFound());
     }
 
     @Test
     public void test_write_diff_mitab_version_rows() throws Exception {
         SolrItemWriter<SolrInteraction> writer = new SolrItemWriter<>();
-        writer.setSolrCrudRepository(interactionRepository);
+        writer.setSolrTemplate(solrTemplate);
+        writer.setSolrCollection(SolrInteraction.INTERACTIONS_CORE_NAME);
         writer.setSolrConverter(solrInteractionConverter);
 
         // add some data to the solrServer using writer
@@ -88,6 +88,6 @@ public class SolrItemWriterUnitTest {
         writer.update(context);
         writer.close();
 
-        Assert.assertEquals(2L, solrClient.query(new SolrQuery("*:*")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrTemplate.getSolrClient().query(SolrInteraction.INTERACTIONS_CORE_NAME, new SolrQuery("*:*")).getResults().getNumFound());
     }
 }

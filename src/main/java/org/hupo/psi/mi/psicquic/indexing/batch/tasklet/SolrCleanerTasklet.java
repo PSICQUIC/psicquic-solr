@@ -1,10 +1,12 @@
 package org.hupo.psi.mi.psicquic.indexing.batch.tasklet;
 
+import org.apache.solr.common.SolrInputDocument;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.data.solr.repository.SolrCrudRepository;
+import org.springframework.data.solr.core.SolrOperations;
+import org.springframework.data.solr.core.query.SimpleQuery;
 
 /**
  * clean solr
@@ -14,25 +16,37 @@ import org.springframework.data.solr.repository.SolrCrudRepository;
  * @since <pre>30/05/12</pre>
  */
 
-public class SolrCleanerTasklet<T> implements Tasklet {
+public class SolrCleanerTasklet<T extends SolrInputDocument> implements Tasklet {
 
-    private SolrCrudRepository<T, String> solrCrudRepository;
+    private SolrOperations solrTemplate;
+    private String solrCollection;
 
     public SolrCleanerTasklet() {
     }
 
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
-        // delete all previous records
-        solrCrudRepository.deleteAll();
-        contribution.getExitStatus().addExitDescription("Cleared.");
+        if (solrTemplate != null){
+
+            // delete all previous records
+            solrTemplate.delete(solrCollection, new SimpleQuery("*:*"));
+
+            // optimize here
+            solrTemplate.commit(solrCollection);
+
+            contribution.getExitStatus().addExitDescription("Cleared: " + solrCollection);
+        }
+        else {
+            throw new IllegalStateException("no SOLR server url found.");
+        }
+
         return RepeatStatus.FINISHED;
     }
 
-    public SolrCrudRepository<T, String> getSolrCrudRepository() {
-        return solrCrudRepository;
+    public void setSolrTemplate(SolrOperations solrTemplate) {
+        this.solrTemplate = solrTemplate;
     }
 
-    public void setSolrCrudRepository(SolrCrudRepository<T, String> solrCrudRepository) {
-        this.solrCrudRepository = solrCrudRepository;
+    public void setSolrCollection(String solrCollection) {
+        this.solrCollection = solrCollection;
     }
 }
