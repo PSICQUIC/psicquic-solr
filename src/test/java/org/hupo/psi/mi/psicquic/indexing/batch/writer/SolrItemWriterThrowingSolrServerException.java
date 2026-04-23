@@ -1,6 +1,7 @@
 package org.hupo.psi.mi.psicquic.indexing.batch.writer;
 
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.common.SolrInputDocument;
 import org.hupo.psi.calimocho.model.Row;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
  * @since <pre>29/04/13</pre>
  */
 
-public class SolrItemWriterThrowingSolrServerException extends SolrItemWriter{
+public class SolrItemWriterThrowingSolrServerException<T extends SolrInputDocument> extends SolrItemWriter<T> {
 
     private boolean secondTime = false;
     private int count = 0;
